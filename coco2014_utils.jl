@@ -1,3 +1,6 @@
+import JSON
+import Images
+
 function coco_to_yolo_bbox(coco_bbox, width, height)
     bbox::Array{Float64} = [0, 0, 0, 0]
 
@@ -12,18 +15,78 @@ function coco_to_yolo_bbox(coco_bbox, width, height)
 end
 
 
-function load_data(images::String, annotations::String; raw_labels::Bool=true)
-    for (root, dirs, files) in walkdir(images)
-        println("Directories in $root")
-        for dir in dirs
-            println(joinpath(root, dir)) # path to directories
-        end
-        # println("Files in $root")
-        # for file in files
-        #     println(joinpath(root, file)) # path to files
-        # end
+function onehot(l, index)
+    v = zeros(l)
+    v[index] = 1
+    return v
+end
+
+
+function read_image(image_path::String; dtype=Array{Float32})
+
+    img = Images.load(image_path)
+    cv = Images.channelview(img)
+
+    # Grayscale handling
+    # cvp = ifelse(ndims(cv) == 3, permutedims(cv, (2,3,1)), repeat(cv, 1,1, 3)) # This is not lazy
+    cvp = ndims(cv) == 3 ? permutedims(cv, (2,3,1)) : repeat(cv, 1,1, 3)
+    cv2arr = convert(dtype, cvp)
+    cv2arr = cv2arr[1:100, 1:100, :]  # For baseline purposes, to be removed
+
+    return cv2arr
+end
+
+
+function load_data(
+    images::String, label_file::String;
+    raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}
+    )
+
+    x = []
+    y = []
+
+    # Read labels
+    if raw_labels
+        labels, class_ids = convert_annotations_to_labels(label_file)
+    else
+        labels = JSON.parsefile(
+            label_file;
+            dicttype=Dict,
+            inttype=Integer,
+            use_mmap=true
+        )
+        class_ids = JSON.parsefile(
+            class_file;
+            dicttype=Dict{String, Integer},
+            inttype=Integer,
+            use_mmap=true
+        )
     end
 
+    class_count = length(class_ids)
+
+    # Read images
+    for (root, _, files) in walkdir(images)
+        for img_path in files
+
+            # println("To do: ", img_path)
+
+            x_curr = read_image(joinpath(root, img_path), dtype=dtype)
+            file_name = split(img_path, ".")[1]
+            y_curr = map(
+                y -> convert(
+                    dtype,
+                    vcat(onehot(class_count, Integer(y[1])), y[2:end])
+                ),
+                get(labels, file_name, [])
+            )
+
+            push!(x, x_curr)
+            push!(y, y_curr)
+        end
+    end
+
+    return x, y
 end
 
 
@@ -35,15 +98,30 @@ function convert_annotations_to_labels(annotation_file::String; kwargs...)
         use_mmap=true
     )
 
-    category_ids = Dict()
+    classes = Dict{String, Integer}()  # default_category_id{String} => category_index{Int}
+    images = Dict()  # image_id => (file_name, width, height)
+    labels = Dict()  # file_name => [class, bbox...]
 
-    for c in annotations["categories"]
-        if !haskey(category_ids, c["id"])
-            category_ids[c["id"]] = length(category_ids) + 1
+    if haskey(kwargs, :class_mappings)
+        classes = JSON.parsefile(
+            kwargs[:class_mappings];
+            dicttype=Dict{String, Integer},
+            inttype=Int32,
+            use_mmap=true
+        )
+    else
+        for c in annotations["categories"]
+            if !haskey(classes, string(c["id"]))
+                classes[string(c["id"])] = length(classes) + 1
+            end
         end
     end
 
-    images = Dict()  # image_id => (file_name, width, height)
+    if haskey(kwargs, :class_mappings_out)
+        open(kwargs[:class_mappings_out], "w") do io
+            JSON.print(io, labels)
+        end
+    end
 
     for img in annotations["images"]
         if !haskey(images, img["id"])
@@ -55,8 +133,6 @@ function convert_annotations_to_labels(annotation_file::String; kwargs...)
         end
     end
 
-    labels = Dict()
-
     for ann in annotations["annotations"]
         file_name = images[ann["image_id"]][1]
         if !haskey(labels, file_name)
@@ -66,7 +142,7 @@ function convert_annotations_to_labels(annotation_file::String; kwargs...)
         push!(
             labels[file_name],
             [
-                category_ids[ann["category_id"]],
+                classes[string(ann["category_id"])],
                 round.(
                     coco_to_yolo_bbox(ann["bbox"], images[ann["image_id"]][2:end]...),
                     digits=6
