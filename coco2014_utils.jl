@@ -69,7 +69,7 @@ function load_data(
     for (root, _, files) in walkdir(images)
         for img_path in files
 
-            # println("To do: ", img_path)
+            println("To do: ", img_path)
 
             x_curr = read_image(joinpath(root, img_path), dtype=dtype)
             file_name = split(img_path, ".")[1]

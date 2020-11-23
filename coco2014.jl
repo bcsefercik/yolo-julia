@@ -5,7 +5,6 @@ packages = ["JSON", "Images"]
 # for p in packages; Pkg.add(p); end
 
 import JSON
-import Images
 
 include("coco2014_utils.jl")
 
