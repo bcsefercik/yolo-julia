@@ -92,18 +92,26 @@ end
 
 function (c::Upsample2d)(x)
     xs = size(x)
+    sf = c.scale_factor
 
     r = convert(
         typeof(x),
         zeros(
-            xs[1] * c.scale_factor,
-            xs[2] * c.scale_factor,
+            xs[1] * sf,
+            xs[2] * sf,
             xs[3],
             xs[4]
         )
     )
+    rs = size(r)
 
-    r[]
+    if c.mode == "nearest"
+        for j in 1:sf
+            for i in 1:sf
+                r[i:sf:rs[1], j:sf:rs[2], :, :] = x
+            end
+        end
+    end
 
     return r
 end
