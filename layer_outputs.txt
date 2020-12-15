@@ -1,0 +1,448 @@
+0 torch.Size([16, 3, 416, 416])
+0/107 Sequential - [16, 32, 416, 416]
+1/107 Sequential - [16, 64, 208, 208]
+2/107 Sequential - [16, 32, 208, 208]
+3/107 Sequential - [16, 64, 208, 208]
+4/107 WeightedFeatureFusion - [16, 64, 208, 208]  >> layer 3 [16, 64, 208, 208] + layer -3 [16, 64, 208, 208]
+5/107 Sequential - [16, 128, 104, 104]
+6/107 Sequential - [16, 64, 104, 104]
+7/107 Sequential - [16, 128, 104, 104]
+8/107 WeightedFeatureFusion - [16, 128, 104, 104]  >> layer 7 [16, 128, 104, 104] + layer -3 [16, 128, 104, 104]
+9/107 Sequential - [16, 64, 104, 104]
+10/107 Sequential - [16, 128, 104, 104]
+11/107 WeightedFeatureFusion - [16, 128, 104, 104]  >> layer 10 [16, 128, 104, 104] + layer -3 [16, 128, 104, 104]
+12/107 Sequential - [16, 256, 52, 52]
+13/107 Sequential - [16, 128, 52, 52]
+14/107 Sequential - [16, 256, 52, 52]
+15/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 14 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+16/107 Sequential - [16, 128, 52, 52]
+17/107 Sequential - [16, 256, 52, 52]
+18/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 17 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+19/107 Sequential - [16, 128, 52, 52]
+20/107 Sequential - [16, 256, 52, 52]
+21/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 20 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+22/107 Sequential - [16, 128, 52, 52]
+23/107 Sequential - [16, 256, 52, 52]
+24/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 23 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+25/107 Sequential - [16, 128, 52, 52]
+26/107 Sequential - [16, 256, 52, 52]
+27/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 26 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+28/107 Sequential - [16, 128, 52, 52]
+29/107 Sequential - [16, 256, 52, 52]
+30/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 29 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+31/107 Sequential - [16, 128, 52, 52]
+32/107 Sequential - [16, 256, 52, 52]
+33/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 32 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+34/107 Sequential - [16, 128, 52, 52]
+35/107 Sequential - [16, 256, 52, 52]
+36/107 WeightedFeatureFusion - [16, 256, 52, 52]  >> layer 35 [16, 256, 52, 52] + layer -3 [16, 256, 52, 52]
+37/107 Sequential - [16, 512, 26, 26]
+38/107 Sequential - [16, 256, 26, 26]
+39/107 Sequential - [16, 512, 26, 26]
+40/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 39 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+41/107 Sequential - [16, 256, 26, 26]
+42/107 Sequential - [16, 512, 26, 26]
+43/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 42 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+44/107 Sequential - [16, 256, 26, 26]
+45/107 Sequential - [16, 512, 26, 26]
+46/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 45 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+47/107 Sequential - [16, 256, 26, 26]
+48/107 Sequential - [16, 512, 26, 26]
+49/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 48 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+50/107 Sequential - [16, 256, 26, 26]
+51/107 Sequential - [16, 512, 26, 26]
+52/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 51 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+53/107 Sequential - [16, 256, 26, 26]
+54/107 Sequential - [16, 512, 26, 26]
+55/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 54 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+56/107 Sequential - [16, 256, 26, 26]
+57/107 Sequential - [16, 512, 26, 26]
+58/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 57 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+59/107 Sequential - [16, 256, 26, 26]
+60/107 Sequential - [16, 512, 26, 26]
+61/107 WeightedFeatureFusion - [16, 512, 26, 26]  >> layer 60 [16, 512, 26, 26] + layer -3 [16, 512, 26, 26]
+62/107 Sequential - [16, 1024, 13, 13]
+63/107 Sequential - [16, 512, 13, 13]
+64/107 Sequential - [16, 1024, 13, 13]
+65/107 WeightedFeatureFusion - [16, 1024, 13, 13]  >> layer 64 [16, 1024, 13, 13] + layer -3 [16, 1024, 13, 13]
+66/107 Sequential - [16, 512, 13, 13]
+67/107 Sequential - [16, 1024, 13, 13]
+68/107 WeightedFeatureFusion - [16, 1024, 13, 13]  >> layer 67 [16, 1024, 13, 13] + layer -3 [16, 1024, 13, 13]
+69/107 Sequential - [16, 512, 13, 13]
+70/107 Sequential - [16, 1024, 13, 13]
+71/107 WeightedFeatureFusion - [16, 1024, 13, 13]  >> layer 70 [16, 1024, 13, 13] + layer -3 [16, 1024, 13, 13]
+72/107 Sequential - [16, 512, 13, 13]
+73/107 Sequential - [16, 1024, 13, 13]
+74/107 WeightedFeatureFusion - [16, 1024, 13, 13]  >> layer 73 [16, 1024, 13, 13] + layer -3 [16, 1024, 13, 13]
+75/107 Sequential - [16, 512, 13, 13]
+76/107 Sequential - [16, 1024, 13, 13]
+77/107 Sequential - [16, 512, 13, 13]
+78/107 Sequential - [16, 1024, 13, 13]
+79/107 Sequential - [16, 512, 13, 13]
+80/107 Sequential - [16, 1024, 13, 13]
+81/107 Sequential - [16, 255, 13, 13]
+82/107 YOLOLayer - [16, 255, 13, 13]
+83/107 FeatureConcat - [16, 512, 13, 13]  >> layer 82 [16, 255, 13, 13] + layer -4 [16, 512, 13, 13]
+84/107 Sequential - [16, 256, 13, 13]
+85/107 Upsample - [16, 256, 26, 26]
+86/107 FeatureConcat - [16, 768, 26, 26]  >> layer 85 [16, 256, 26, 26] + layer -1 [16, 256, 26, 26] + layer 61 [16, 512, 26, 26]
+87/107 Sequential - [16, 256, 26, 26]
+88/107 Sequential - [16, 512, 26, 26]
+89/107 Sequential - [16, 256, 26, 26]
+90/107 Sequential - [16, 512, 26, 26]
+91/107 Sequential - [16, 256, 26, 26]
+92/107 Sequential - [16, 512, 26, 26]
+93/107 Sequential - [16, 255, 26, 26]
+94/107 YOLOLayer - [16, 255, 26, 26]
+95/107 FeatureConcat - [16, 256, 26, 26]  >> layer 94 [16, 255, 26, 26] + layer -4 [16, 256, 26, 26]
+96/107 Sequential - [16, 128, 26, 26]
+97/107 Upsample - [16, 128, 52, 52]
+98/107 FeatureConcat - [16, 384, 52, 52]  >> layer 97 [16, 128, 52, 52] + layer -1 [16, 128, 52, 52] + layer 36 [16, 256, 52, 52]
+99/107 Sequential - [16, 128, 52, 52]
+100/107 Sequential - [16, 256, 52, 52]
+101/107 Sequential - [16, 128, 52, 52]
+102/107 Sequential - [16, 256, 52, 52]
+103/107 Sequential - [16, 128, 52, 52]
+104/107 Sequential - [16, 256, 52, 52]
+105/107 Sequential - [16, 255, 52, 52]
+106/107 YOLOLayer - [16, 255, 52, 52]
+
+
+
+
+
+
+
+model = Darknet(
+  (module_list): ModuleList(
+    (0): Sequential(
+      (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (1): Sequential(
+      (0): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (2): Sequential(
+      (0): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (3): Sequential(
+      (0): Conv2d(32, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (4): WeightedFeatureFusion()
+    (5): Sequential(
+      (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (6): Sequential(
+      (0): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (7): Sequential(
+      (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (8): WeightedFeatureFusion()
+    (9): Sequential(
+      (0): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (10): Sequential(
+      (0): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (11): WeightedFeatureFusion()
+    (12): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (13): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (14): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (15): WeightedFeatureFusion()
+    (16): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (17): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (18): WeightedFeatureFusion()
+    (19): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (20): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (21): WeightedFeatureFusion()
+    (22): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (23): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (24): WeightedFeatureFusion()
+    (25): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (26): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (27): WeightedFeatureFusion()
+    (28): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (29): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (30): WeightedFeatureFusion()
+    (31): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (32): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (33): WeightedFeatureFusion()
+    (34): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (35): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (36): WeightedFeatureFusion()
+    (37): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (38): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (39): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (40): WeightedFeatureFusion()
+    (41): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (42): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (43): WeightedFeatureFusion()
+    (44): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (45): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (46): WeightedFeatureFusion()
+    (47): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (48): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (49): WeightedFeatureFusion()
+    (50): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (51): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (52): WeightedFeatureFusion()
+    (53): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (54): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (55): WeightedFeatureFusion()
+    (56): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (57): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (58): WeightedFeatureFusion()
+    (59): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (60): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (61): WeightedFeatureFusion()
+    (62): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (63): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (64): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (65): WeightedFeatureFusion()
+    (66): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (67): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (68): WeightedFeatureFusion()
+    (69): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (70): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (71): WeightedFeatureFusion()
+    (72): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (73): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (74): WeightedFeatureFusion()
+    (75): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (76): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (77): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (78): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (79): Sequential(
+      (0): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (80): Sequential(
+      (0): Conv2d(512, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (81): Sequential(
+      (Conv2d): Conv2d(1024, 255, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (82): YOLOLayer()
+    (83): FeatureConcat()
+    (84): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (85): Upsample(scale_factor=2.0, mode=nearest)
+    (86): FeatureConcat()
+    (87): Sequential(
+      (0): Conv2d(768, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (88): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (89): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (90): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (91): Sequential(
+      (0): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (92): Sequential(
+      (0): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (93): Sequential(
+      (Conv2d): Conv2d(512, 255, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (94): YOLOLayer()
+    (95): FeatureConcat()
+    (96): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (97): Upsample(scale_factor=2.0, mode=nearest)
+    (98): FeatureConcat()
+    (99): Sequential(
+      (0): Conv2d(384, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (100): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (101): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (102): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (103): Sequential(
+      (0): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (104): Sequential(
+      (0): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): LeakyReLU(negative_slope=0.1, inplace=True)
+    )
+    (105): Sequential(
+      (Conv2d): Conv2d(256, 255, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (106): YOLOLayer()
+  )
+)
