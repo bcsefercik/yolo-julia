@@ -5,7 +5,9 @@ using Knet
 
 # Leaky ReLU
 function lrelu(x, alpha=0.1)
-    return max(alpha * x, x)
+    pos = relu(x)
+    neg = relu(-x)
+    return pos + alpha * neg
 end
 
 
@@ -75,7 +77,7 @@ function (c::BatchNorm2d)(x)
 end
 
 
-# @D Upsample
+# 2D Upsample
 struct Upsample2d
     scale_factor; mode
 

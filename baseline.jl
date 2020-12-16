@@ -19,7 +19,11 @@ load_data(
 
 
 
-include("utils/nn.jl")
+#=include("utils/nn.jl")
 
 import .NN
+=#
 
+include("utils/parse_config.jl")
+
+mdefs = parse_model_cfg("yolov3.cfg")
