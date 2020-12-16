@@ -1,13 +1,75 @@
 module NN
 
 using Knet
+using Knet: conv4, pool, mat, sigm, KnetArray, nll, zeroone, progress, adam!, sgd!, param, param0, dropout, relu, minibatch, Data
+
+using Statistics
+
+
+struct Dense
+    w; b; f; p;
+
+    function Dense(inputsize::Int, outputsize::Int, f=lrelu;
+            pdrop=0, atype=Knet.atype())
+
+        return new(
+            param(outputsize, inputsize; atype=atype),
+            param0(outputsize; atype=atype),
+            f,
+            pdrop
+        )
+    end
+end
+
+(d::Dense)(x) = d.f.(d.w * mat(x) .+ d.b)
+
+
+
+
+# Define chain of layers
+struct Chain
+    layers
+    Chain(layers...) = new(layers)
+end
+
+(c::Chain)(x) = (for l in c.layers; x = l(x); end; x)  # Forward pass
+
+
+function (c::Chain)(x, y; accuracy::Bool=false)
+    y_pred = c(x)
+
+    if accuracy
+        correct = 0.0
+
+        for i=1:length(y)
+            correct += y[i] == findmax(y_pred[:, i]; dims=1)[2][1] ? 1.0 : 0.0
+        end
+
+        return correct / length(y)
+    else
+        return nll(y_pred, y)
+    end
+end
+
+(c::Chain)(d::Data; accuracy::Bool=false) = mean(c(x,y; accuracy=accuracy) for (x,y) in d)  # Batch loss
 
 
 # Leaky ReLU
-function lrelu(x, alpha=0.1)
+struct LeakyReLU
+    alpha
+    function LeakyReLU(; alpha=0.1)
+        return new(alpha)
+    end
+end
+
+function (c::LeakyReLU)(x)
+    return max.(x, c.alpha * x)
+end
+
+function lrelu(x)
     pos = relu(x)
     neg = relu(-x)
-    return pos + alpha * neg
+    return pos + 0.1 * neg
 end
 
 
