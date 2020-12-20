@@ -1,5 +1,7 @@
 module NN
 
+import Base: push!
+
 using Knet
 using Knet: conv4, pool, mat, sigm, KnetArray, nll, zeroone, progress, adam!, sgd!, param, param0, dropout, relu, minibatch, Data
 
@@ -29,10 +31,14 @@ end
 # Define chain of layers
 struct Chain
     layers
-    Chain(layers...) = new(layers)
+    Chain(layers...) = new(convert(Array{Any}, [l for l in layers]))
 end
 
 (c::Chain)(x) = (for l in c.layers; x = l(x); end; x)  # Forward pass
+
+function push!(c::Chain, layer)
+    return push!(c.layers, layer)
+end
 
 
 function (c::Chain)(x, y; accuracy::Bool=false)
@@ -57,19 +63,19 @@ end
 # Leaky ReLU
 struct LeakyReLU
     alpha
-    function LeakyReLU(; alpha=0.1)
-        return new(alpha)
+    function LeakyReLU(alpha=0.1, atype=Knet.atype())
+        return new(convert(atype, [alpha]))
     end
 end
 
 function (c::LeakyReLU)(x)
-    return max.(x, c.alpha * x)
+    return max.(x, c.alpha .* x)
 end
 
-function lrelu(x)
+function leaky_relu(x, alpha=0.02)
     pos = relu(x)
-    neg = relu(-x)
-    return pos + 0.1 * neg
+    neg = -relu(-x)
+    return pos + oftype(x, alpha) * neg
 end
 
 
@@ -78,12 +84,12 @@ struct Conv2d
     w; b; stride; padding;
 
     function Conv2d(
+        kernel_size,
         in_channels::Int,
-        out_channels::Int,
-        kernel_size;
+        out_channels::Int;
         stride=1,
-        padding=1,
-        bias=true,
+        padding=0,
+        bias=false,
         atype=Knet.atype()
     )
 
@@ -155,6 +161,70 @@ struct Upsample2d
 end
 
 function (c::Upsample2d)(x)
+    return unpool(x; window=c.scale_factor)
+end
+
+
+struct FeatureConcat
+    layers; multiple
+
+    function FeatureConcat(
+        layers
+    )
+        return new(
+            layers,
+            length(layers) > 1
+        )
+    end
+end
+
+#=function (c::FeatureConcat)(x, outputs)
+    # TODO: implement this
+    # return torch.cat([outputs[i] for i in self.layers], 1) if self.multiple else outputs[self.layers[0]]
+
+end
+=#
+struct WeightedFeatureFusion
+    layers; n
+
+    function WeightedFeatureFusion(
+        layers
+    )
+        return new(
+            layers,
+            length(layers) + 1
+        )
+    end
+end
+
+
+#=# TODO
+class WeightedFeatureFusion(nn.Module):  # weighted sum of 2 or more layers https://arxiv.org/abs/1911.09070
+    def __init__(self, layers, weight=False):
+        super(WeightedFeatureFusion, self).__init__()
+        self.layers = layers  # layer indices
+        self.n = len(layers) + 1  # number of layers
+
+    def forward(self, x, outputs):
+        # Weights
+        # Fusion
+        nx = x.shape[1]  # input channels
+        for i in range(self.n - 1):
+            a = outputs[self.layers[i]] * w[i + 1] if self.weight else outputs[self.layers[i]]  # feature to add
+            na = a.shape[1]  # feature channels
+
+            print("nx==na", nx == na)
+
+            if nx != na:
+                raise Exception
+
+            # Adjust channels
+            x = x + a
+
+        return x=#
+
+
+#=function (c::Upsample2d)(x)
     xs = size(x)
     sf = c.scale_factor
 
@@ -178,7 +248,7 @@ function (c::Upsample2d)(x)
     end
 
     return r
-end
+end=#
 
 
 #=struct Dense
