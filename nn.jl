@@ -178,12 +178,13 @@ struct FeatureConcat
     end
 end
 
-#=function (c::FeatureConcat)(x, outputs)
-    # TODO: implement this
-    # return torch.cat([outputs[i] for i in self.layers], 1) if self.multiple else outputs[self.layers[0]]
+function (c::FeatureConcat)(x, outputs)
+    layers = [l < 1 ? l + length(outputs) : l for l in c.layers]
 
+    return c.multiple ? cat(outputs[layers]..., dims=3) : outputs[layers[1]]
 end
-=#
+
+
 struct WeightedFeatureFusion
     layers; n
 
@@ -196,6 +197,12 @@ struct WeightedFeatureFusion
         )
     end
 end
+
+function (c::WeightedFeatureFusion)(x, outputs)
+    # TODO: implement this
+    return x
+end
+
 
 
 #=# TODO

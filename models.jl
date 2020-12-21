@@ -1,4 +1,5 @@
 include("nn.jl")
+include("utils/parse_config.jl")
 
 import .NN
 
@@ -52,23 +53,25 @@ function create_modules(module_defs, img_size)
 
         elseif mdef["type"] == "route"
             layers = mdef["layers"]
-            filters = sum([output_filters[l > 0 ? l + 2 : length(output_filters) + l + 1] for l in layers])
-            append!(routes, [l < 0 ? i + l : l + 1 for l in layers])
+            filters = sum([output_filters[l > 1 ? l + 1 : length(output_filters) + l] for l in layers])
+            append!(routes, [l < 1 ? i + l - 1 : l for l in layers])
 
-            # TODO: impolement this:
+            # println(i, layers, filters, [l < 1 ? i + l - 1 : l for l in layers])
+            # println(length(output_filters), [l > 1 ? l + 1 : length(output_filters) + l for l in layers])
+
             modules = NN.FeatureConcat(layers)
 
         elseif mdef["type"] == "shortcut"
             layers = mdef["from"]
             filters = output_filters[end]
-            append!(routes, [l < 0 ? i + l : l + 1 for l in layers])
+            append!(routes, [l < 1 ? i + l - 1 : l for l in layers])
 
             # TODO: implement this:
             modules = NN.WeightedFeatureFusion(layers)
 
         elseif mdef["type"] == "yolo"
             # TODO: implement:
-            continue
+            println("yolo")
         else
             println("Warning: Unrecognized Layer Type: ", mdef["type"])
         end
@@ -77,5 +80,56 @@ function create_modules(module_defs, img_size)
         push!(output_filters, filters)
     end
 
-    return module_list, routes
+    routes_bin = Array{Bool}([false for _ in 1:length(module_list)])
+    routes_bin[routes] .= true
+
+    return module_list, routes_bin
+end
+
+
+struct Darknet
+    module_defs
+    module_list
+    routes
+    yolo_layers
+
+    function Darknet(
+        cfg;
+        img_size=(416, 416),
+        verbose=false
+    )
+        module_defs = parse_model_cfg(cfg)
+        module_list, routes = create_modules(module_defs, img_size)
+        yolo_layers = nothing
+
+        return new(
+            module_defs,
+            module_list,
+            routes,
+            yolo_layers
+        )
+    end
+end
+
+function (c::Darknet)(x; verbose=false)
+    img_size = size(x)[1:2]
+    yolo_out, out = [], []
+
+    if verbose; println("0 ", size(x)); end
+
+    for (i, layer) in enumerate(c.module_list)
+        layer_type = typeof(layer)
+
+        if layer_type in [NN.FeatureConcat, NN.WeightedFeatureFusion]
+            x = layer(x, out)
+        else
+            x = layer(x)
+        end
+
+        push!(out, c.routes[i] ? x : [])
+
+        if verbose
+            println("$i /$(length(c.module_list)) $layer_type ", size(x))
+        end
+    end
 end

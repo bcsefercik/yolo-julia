@@ -41,7 +41,7 @@ function parse_model_cfg(path::String="yolov3.cfg"; atype=Knet.atype())
                 mdefs[end][key] = convert(atype, reshape(anchors, 2, :))
 
             elseif (key in ("from", "layers", "mask")) || (key == "size" && occursin(",", val))
-                mdefs[end][key] = [parse(Int, x) + (key == "mask" ? 1 : 0) for x in split(val, ",")]
+                mdefs[end][key] = [parse(Int, x) + 1 for x in split(val, ",")]
 
             elseif key == "batch_normalize"
                 mdefs[end][key] = get_number(val) == 1
