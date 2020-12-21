@@ -107,7 +107,7 @@ struct Darknet
             module_list,
             routes,
             yolo_layers
-        )
+        );
     end
 end
 
@@ -132,4 +132,6 @@ function (c::Darknet)(x; verbose=false)
             println("$i /$(length(c.module_list)) $layer_type ", size(x))
         end
     end
+
+    return x
 end

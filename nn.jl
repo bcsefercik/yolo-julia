@@ -199,7 +199,13 @@ struct WeightedFeatureFusion
 end
 
 function (c::WeightedFeatureFusion)(x, outputs)
-    # TODO: implement this
+    # Next version: implement weighted version
+    layers = [l < 1 ? l + length(outputs) : l for l in c.layers]
+
+    for l in layers
+        x = x .+ outputs[l]
+    end
+
     return x
 end
 
