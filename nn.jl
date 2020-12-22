@@ -62,6 +62,10 @@ function (c::Chain)(x, y; accuracy::Bool=false)
 
         return correct / length(y)
     else
+
+        #=y_pred1 = reshape(y_pred, (1,10, :))
+        y_pred1 = permutedims(y_pred1, (3,1,2))
+        y_pred = reshape(y_pred, (10, :))=#
         return nll(y_pred, y)
     end
 end

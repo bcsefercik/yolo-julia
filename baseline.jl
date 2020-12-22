@@ -28,6 +28,9 @@ import .NN
 include("utils/parse_config.jl")
 include("models.jl")
 
-mdefs = parse_model_cfg("yolov3.cfg")
+#=mdefs = parse_model_cfg("yolov3.cfg")
 
-layers = create_modules(mdefs, 416)
+module_list, routes = create_modules(mdefs, 416)
+=#
+
+darknet = Darknet("yolov3.cfg");

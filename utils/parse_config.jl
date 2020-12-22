@@ -38,7 +38,7 @@ function parse_model_cfg(path::String="yolov3.cfg"; atype=Knet.atype())
             key, val = strip(key), strip(val)
             if key == "anchors"
                 anchors =  [parse(Float32, x) for x in split(val, ",")]
-                mdefs[end][key] = convert(atype, reshape(anchors, 2, :))
+                mdefs[end][key] = convert(atype, transpose(reshape(anchors, 2, :)))
 
             elseif (key in ("from", "layers", "mask")) || (key == "size" && occursin(",", val))
                 mdefs[end][key] = [parse(Int, x) + 1 for x in split(val, ",")]

@@ -3,7 +3,7 @@ include("utils/parse_config.jl")
 
 import .NN
 
-function create_modules(module_defs, img_size)
+function create_modules(module_defs, img_size; atype=Knet.atype())
     img_size = isa(img_size, Int) ? (img_size, img_size) : img_size
 
     filters = module_defs[1]["channels"]
@@ -11,7 +11,7 @@ function create_modules(module_defs, img_size)
 
     module_list = []
     routes = []
-    yolo_index = -1
+    yolo_index = 0
 
     for (i, mdef) in enumerate(module_defs[2:end])
         modules = NN.Chain()
@@ -69,8 +69,38 @@ function create_modules(module_defs, img_size)
             modules = NN.WeightedFeatureFusion(layers)
 
         elseif mdef["type"] == "yolo"
-            # TODO: implement:
-            println("yolo")
+            yolo_index += 1
+            stride = [32, 16, 8]  # P5, P4, P3 strides
+            layers = get(mdef, "from", [])
+            anchors = mdef["anchors"][mdef["mask"], :]
+            modules = YOLOLayer(
+                anchors,
+                mdef["classes"],
+                img_size,
+                yolo_index,
+                layers,
+                stride[yolo_index]
+            )
+
+
+
+            # Initialize preceding Conv2d() bias (https://arxiv.org/pdf/1708.02002.pdf section 3.3)
+            #=try
+                j = get(mdef, "from", 0)
+                j = j < 1 ? j + length(module_list) : j
+
+                bias_ = value(module_list[j].layers[1].b)
+                bias = bias_[:, :, 1:modules.no * modules.na, :]
+                bias = reshape(bias, (modules.na, :))
+                bias[:, 5] = bias[:, 5] .- 4.5
+                bias[:, 6:end] = bias[:, 6:end] .+ log(0.6 / (modules.nc - 0.99))
+                bias = reshape(bias, (1, 1, :, 1))
+                module_list[j].layers[1].b = Param(convert(atype, bias))
+
+            catch y
+                println("WARNING: smart bias initialization failure. ", y)
+            end=#
+
         else
             println("Warning: Unrecognized Layer Type: ", mdef["type"])
         end
@@ -91,6 +121,7 @@ struct Darknet
     module_list
     routes
     yolo_layers
+    verbose
 
     function Darknet(
         cfg;
@@ -99,22 +130,24 @@ struct Darknet
     )
         module_defs = parse_model_cfg(cfg)
         module_list, routes = create_modules(module_defs, img_size)
-        yolo_layers = nothing
+
+        yolo_layers = [i for (i, m) in enumerate(module_list) if typeof(m) == YOLOLayer]
 
         return new(
             module_defs,
             module_list,
             routes,
-            yolo_layers
+            yolo_layers,
+            verbose
         );
     end
 end
 
-function (c::Darknet)(x; verbose=false)
+function (c::Darknet)(x; training=true)
     img_size = size(x)[1:2]
     yolo_out, out = [], []
 
-    if verbose; println("0 ", size(x)); end
+    if c.verbose; println("0 ", size(x)); end
 
     for (i, layer) in enumerate(c.module_list)
         layer_type = typeof(layer)
@@ -123,18 +156,80 @@ function (c::Darknet)(x; verbose=false)
             x = layer(x, out)
 
         elseif layer_type == YOLOLayer
-            continue
+            push!(yolo_out, layer(x, out; training=training))
         else
             x = layer(x)
         end
 
         push!(out, c.routes[i] ? x : [])
 
-        if verbose
-            println(x[:,:,:,1])
+        if c.verbose
+            println(typeof(x))
             println("$i /$(length(c.module_list)) $layer_type ", size(x))
         end
     end
 
-    return x
+    if training
+        return yolo_out
+    else
+        return x
+    end
+end
+
+function (c::Darknet)(x, y; training=true)
+
+    # TODO: Implement Loss
+
+end
+
+
+mutable struct YOLOLayer
+    anchors
+    index
+    layers
+    stride
+    nl
+    na
+    nc
+    no
+    nx; ny; ng
+    anchor_vec
+    anchor_wh
+
+    function YOLOLayer(
+        anchors,
+        nc,
+        img_size,
+        yolo_index,
+        layers,
+        stride
+    )
+        na = size(anchors)[1]
+        ns = yolo_index * 13
+        anchor_vec = anchors ./ stride
+        return new(
+            anchors,
+            yolo_index,
+            layers,
+            stride,
+            length(layers),
+            na,
+            nc,
+            nc + 5,
+            ns, ns, (ns, ns),
+            anchor_vec,
+            reshape(anchor_vec, (1, na, 1, 1, 2))
+        )
+    end
+end
+
+function (c::YOLOLayer)(p, out; training=true)
+    ny, nx, _, bs = size(p)
+
+    r = reshape(p, (ny, nx, c.no, c.na, bs))
+    r = permutedims(r, (3, 1, 2, 4, 5))
+
+    if training
+        return r
+    end
 end
