@@ -66,7 +66,6 @@ function create_modules(module_defs, img_size)
             filters = output_filters[end]
             append!(routes, [l < 1 ? i + l - 1 : l for l in layers])
 
-            # TODO: implement this:
             modules = NN.WeightedFeatureFusion(layers)
 
         elseif mdef["type"] == "yolo"
@@ -122,6 +121,8 @@ function (c::Darknet)(x; verbose=false)
 
         if layer_type in [NN.FeatureConcat, NN.WeightedFeatureFusion]
             x = layer(x, out)
+        elseif layer_type == YOLOLayer
+            continue
         else
             x = layer(x)
         end
@@ -129,6 +130,7 @@ function (c::Darknet)(x; verbose=false)
         push!(out, c.routes[i] ? x : [])
 
         if verbose
+            println(x[:,:,:,1])
             println("$i /$(length(c.module_list)) $layer_type ", size(x))
         end
     end
