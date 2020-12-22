@@ -121,6 +121,7 @@ function (c::Darknet)(x; verbose=false)
 
         if layer_type in [NN.FeatureConcat, NN.WeightedFeatureFusion]
             x = layer(x, out)
+
         elseif layer_type == YOLOLayer
             continue
         else

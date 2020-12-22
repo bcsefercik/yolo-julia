@@ -1,3 +1,12 @@
+using CUDA
+using Knet
+
+function Knet.KnetArray(x::CuArray{T,N}) where {T,N}
+    p = Base.bitcast(Knet.Cptr, pointer(x))
+    k = Knet.KnetPtr(p, sizeof(x), Int(CUDA.device().handle), x)
+    KnetArray{T,N}(k, size(x))
+end
+
 module NN
 
 import Base: push!
