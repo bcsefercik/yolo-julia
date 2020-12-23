@@ -176,11 +176,27 @@ function (c::Darknet)(x; training=true)
     end
 end
 
-function (c::Darknet)(x, y; training=true)
+function (c::Darknet)(x, y; training::Bool=true)
 
     # TODO: Implement Loss
+    loss = 0.0
+
+    yolo_out = c(x)
+
+    for (i, out) in enumerate(yolo_out)
+        bs = size(out)[end]
+        yolo_re = reshape(out, (85, :, bs));
+        y = rand(1:1, (1, size(yolo_re)[2:end]...))
+
+        loss += nll(yolo_re, y)
+    end
+
+    return loss
 
 end
+
+(c::Darknet)(d::Data) = mean(c(x,y) for (x,y) in d)  # Batch loss
+
 
 
 mutable struct YOLOLayer
