@@ -35,9 +35,6 @@ end
 (d::Dense)(x) = d.f.(d.w * mat(x) .+ d.b)
 
 
-
-
-# Define chain of layers
 struct Chain
     layers
     Chain(layers...) = new(convert(Array{Any}, [l for l in layers]))

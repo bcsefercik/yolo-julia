@@ -22,16 +22,17 @@ function onehot(l, index)
 end
 
 
-function read_image(image_path::String; dtype=Array{Float32})
+function read_image(image_path::String, img_size=(416, 416); dtype=Array{Float32})
 
     img = Images.load(image_path)
+    img = Images.imresize(img, img_size)
     cv = Images.channelview(img)
 
     # Grayscale handling
     # cvp = ifelse(ndims(cv) == 3, permutedims(cv, (2,3,1)), repeat(cv, 1,1, 3)) # This is not lazy
     cvp = ndims(cv) == 3 ? permutedims(cv, (2,3,1)) : repeat(cv, 1,1, 3)
     cv2arr = convert(dtype, cvp)
-    cv2arr = cv2arr[1:100, 1:100, :]  # For baseline purposes, to be removed
+    # cv2arr = cv2arr[1:416, 1:416, :]  # For baseline purposes, to be removed
 
     return cv2arr
 end
@@ -42,7 +43,7 @@ function load_data(
     raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}
     )
 
-    x = []
+    x = nothing
     y = []
 
     # Read labels
@@ -69,19 +70,28 @@ function load_data(
     for (root, _, files) in walkdir(images)
         for img_path in files
 
-            println("To do: ", img_path)
+            # println("Loading: ", img_path)
 
             x_curr = read_image(joinpath(root, img_path), dtype=dtype)
             file_name = split(img_path, ".")[1]
-            y_curr = map(
-                y -> convert(
-                    dtype,
-                    vcat(onehot(class_count, Integer(y[1])), y[2:end])
-                ),
-                get(labels, file_name, [])
-            )
+            # y_curr_list = map(
+            #     y -> convert(
+            #         dtype,
+            #         vcat(onehot(class_count, Integer(y[1])), y[1:end])
+            #     ),
+            #     get(labels, file_name, [])
+            # )
 
-            push!(x, x_curr)
+            y_curr = get(labels, file_name, [])
+
+            # cat(x, x_curr; dims=)
+            # push!(y, y_curr)
+            if x == nothing
+                x = x_curr
+            else
+                x = cat(x, x_curr; dims=4)
+            end
+
             push!(y, y_curr)
         end
     end

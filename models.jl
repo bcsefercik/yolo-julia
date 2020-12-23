@@ -1,3 +1,6 @@
+using Knet: Data
+using Knet
+
 include("nn.jl")
 include("utils/parse_config.jl")
 
