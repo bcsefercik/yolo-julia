@@ -11,6 +11,8 @@ function coco_to_yolo_bbox(coco_bbox, width, height)
     bbox[1] += bbox[3] / 2
     bbox[2] += bbox[4] / 2
 
+    # (center_x, center_y, width, height)
+
     return bbox
 end
 
@@ -23,7 +25,7 @@ end
 
 
 function read_image(image_path::String, img_size=(416, 416); dtype=Array{Float32})
-
+    # img_size: height, width
     img = Images.load(image_path)
     img = Images.imresize(img, img_size)
     cv = Images.channelview(img)
