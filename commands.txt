@@ -1,0 +1,5 @@
+
+===========================
+darknet_pytorch
+---------------------------
+python3 train.py --data data/coco2014.data --cfg=cfg/yolov3.cfg --weights '' --img-size 416 416 --batch-size 2
