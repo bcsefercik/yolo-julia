@@ -213,8 +213,7 @@ function (model::Darknet)(x, y; training::Bool=true)
             end
 
             pxy = sigm.(ps[1:2, :])
-
-            pwh = clamp.(exp.(ps[3:4, :]), 0, 1000) .* anchors[i]'
+            pwh = clamp_.(exp.(ps[3:4, :]), 0, 1000) .* anchors[i]'
             pbox = cat(pxy, pwh; dims=1)  # vcat
 
             giou = bbox_giou(

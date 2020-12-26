@@ -2,6 +2,12 @@ using Knet
 
 include("../hyper_params.jl")
 
+
+function clamp_(x, lo, hi)
+    return min.(max.(x, lo), hi)
+end
+
+
 function build_targets(p, targets, model)
     # p: yolo_outs
 
@@ -33,10 +39,11 @@ function build_targets(p, targets, model)
         at = repeat(reshape(1:na, (na, 1)), 1, nt)
 
         a, t, offsets = [], targets_reshaped .* gain, 0.0
-
+        # t = convert(model.atype, t)
         if nt > 0
             j = wh_iou(anchors, t[:, 5:6]) .> PARAM_IOU_T
             tt = repeat(t, na)
+            j = convert(Array{Bool}, j)
             jj = vcat(j'...)
             a, t = at'[j'], tt[jj, :]
 
@@ -55,8 +62,8 @@ function build_targets(p, targets, model)
             (
                 b,
                 a,
-                Integer.(clamp.(gj, 1, gain[4])),
-                Integer.(clamp.(gi, 1, gain[3]))
+                Integer.(clamp_.(gj, 1, gain[4])),
+                Integer.(clamp_.(gi, 1, gain[3]))
             )
         )
 
@@ -77,7 +84,7 @@ function wh_iou(wh1, wh2)
     N, _ = size(wh1)
     M, _ = size(wh2)
     wh1r = reshape(wh1, (:, 1, 2))  # [N,1,2]
-    wh2r = reshape(wh2, (1, :, 2))  # [1,M,2]
+    wh2r = convert(Knet.atype(), reshape(wh2, (1, :, 2)))  # [1,M,2]
 
     inter = reshape(
         prod(min.(wh1r, wh2r), dims=3),
@@ -104,8 +111,8 @@ function bbox_giou(box1, box2; x1y1x2y2=false)
     b2_y1 = box2[2, :] .- box2[4, :] ./ 2
     b2_y2 = box2[2, :] .+ box2[4, :] ./ 2
 
-    inter = clamp.(min.(b1_x2, b2_x2) - max.(b1_x1, b2_x1), 0, 1000000) .*
-            clamp.(min.(b1_y2, b2_y2) - max.(b1_y1, b2_y1), 0, 1000000)
+    inter = clamp_.(min.(b1_x2, b2_x2) - max.(b1_x1, b2_x1), 0, 1000000) .*
+            clamp_.(min.(b1_y2, b2_y2) - max.(b1_y1, b2_y1), 0, 1000000)
 
     w1, h1 = box1[3, :], box1[4, :]
     w2, h2 = box2[3, :], box2[4, :]
