@@ -1,6 +1,8 @@
+using Knet
+
 include("../hyper_params.jl")
 
-function build_targets(p, targets, model; atype=Knet.atype())
+function build_targets(p, targets, model)
     # p: yolo_outs
 
     targets_reshaped = hcat(targets[1]...)
@@ -20,7 +22,7 @@ function build_targets(p, targets, model; atype=Knet.atype())
 
     nt = size(targets_reshaped)[1]
     tcls, tbox, indices, anch = [], [], [], []
-    gain = convert(atype, ones(1, 6))
+    gain = convert(model.atype, ones(1, 6))
 
     for (i, j) in enumerate(model.yolo_layers)
         # i: yolo_layer intra index (1, 2, 3)
@@ -86,6 +88,38 @@ function wh_iou(wh1, wh2)
     uni = uni .- inter  # [N,M]
 
     return inter ./ uni
+end
 
 
+function bbox_giou(box1, box2; x1y1x2y2=false)
+    box2 = convert(Knet.atype(), transpose(box2))
+
+    b1_x1 = box1[1, :] .- box1[3, :] ./ 2
+    b1_x2 = box1[1, :] .+ box1[3, :] ./ 2
+    b1_y1 = box1[2, :] .- box1[4, :] ./ 2
+    b1_y2 = box1[2, :] .+ box1[4, :] ./ 2
+
+    b2_x1 = box2[1, :] .- box2[3, :] ./ 2
+    b2_x2 = box2[1, :] .+ box2[3, :] ./ 2
+    b2_y1 = box2[2, :] .- box2[4, :] ./ 2
+    b2_y2 = box2[2, :] .+ box2[4, :] ./ 2
+
+    inter = clamp.(min.(b1_x2, b2_x2) - max.(b1_x1, b2_x1), 0, 1000000) .*
+            clamp.(min.(b1_y2, b2_y2) - max.(b1_y1, b2_y1), 0, 1000000)
+
+    w1, h1 = box1[3, :], box1[4, :]
+    w2, h2 = box2[3, :], box2[4, :]
+
+    uni = (w1 .* h1 .+ 1e-16) + w2 .* h2 .- inter
+
+    iou = inter ./ uni
+
+    # GIoU
+    # Generalized IoU https://arxiv.org/pdf/1902.09630.pdf
+    cw = max.(b1_x2, b2_x2) .- min.(b1_x1, b2_x1)  # convex (smallest enclosing box) width
+    ch = max.(b1_y2, b2_y2) .- min.(b1_y1, b2_y1)  # convex height
+
+    c_area = cw .* ch .+ 1e-16  # convex area
+
+    return iou .- ((c_area .- uni) ./ c_area)
 end

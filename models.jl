@@ -1,5 +1,7 @@
-using Knet: Data
-using Knet
+using Statistics
+
+using Knet: Data, sigm
+import Knet: sigm
 
 include("nn.jl")
 include("utils/parse_config.jl")
@@ -187,7 +189,8 @@ function (model::Darknet)(x, y; training::Bool=true)
     # TODO: Implement Loss
     # p = yolo_out, targets = y, pi = out
     yolo_out = model(x)  # p
-    lcls, lbox, lobj = 0.0, 0.0, 0.0
+    losses = convert(model.atype, zeros(3))
+    lcls, lbox, lobj = losses[1], losses[2], losses[3]
     tcls, tbox, indices, anchors = build_targets(yolo_out, y, model)  # targets
 
     red = "mean"  # Loss reduction (sum or mean)
@@ -200,29 +203,48 @@ function (model::Darknet)(x, y; training::Bool=true)
         tobj = zeros(size(out)[2:end])  # target object
 
         nb = size(b)[1]
-
         if nb > 0
             nt += nb
-            ps = out[:, gj, gi, a, b]  # gj for y, gi for x
+            ps = out[:, gj[1], gi[1], a[1], b[1]]  # gj for y, gi for x
 
-            return out, b, a, gj, gi
+            # ps = Param(convert(Knet.atype(), ps))
+
+            for psi in 2:length(gj)
+                ps = hcat(ps, out[:, gj[psi], gi[psi], a[psi], b[psi]])
+            end
+            # pxy = tanh.(ps[1:2, :])
+            pxy = sigm.(ps[1:2, :])
+
+            # pxy = ps[1:2, :]
+            pwh = clamp.(exp.(ps[3:4, :]), 0, 1000) .* anchors[i]'
+            pbox = cat(pxy, pwh; dims=1)  # vcat
+
+            giou = bbox_giou(
+                pbox,
+                convert(model.atype, tbox[i]);
+                x1y1x2y2=false
+            )
+
+            lbox = lbox + (sum(1.0 .- giou) ./ nb)
         end
-
-
-
-
-
-        bs = size(out)[end]
-        yolo_re = reshape(out, (85, :, bs));
-        y = rand(1:1, (1, size(yolo_re)[2:end]...))
-
-        loss += nll(yolo_re, y)
     end
+
+    loss = lbox + lobj + lcls
 
     return loss
 
 end
 
+# Batch loss
+# function (model::Darknet)(d::Data)
+#     loss = 0.0
+
+#     for (x, y) in d
+#         l = model(x, y)
+
+#         loss += l
+#     end
+# end
 (c::Darknet)(d::Data) = mean(c(x,y) for (x,y) in d)  # Batch loss
 
 
