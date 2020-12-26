@@ -19,6 +19,7 @@ function build_targets(p, targets, model)
     end
 
     targets_reshaped = transpose(targets_reshaped)
+    targets_reshaped = convert(model.atype, targets_reshaped)
 
     nt = size(targets_reshaped)[1]
     tcls, tbox, indices, anch = [], [], [], []
