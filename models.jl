@@ -207,7 +207,6 @@ function (model::Darknet)(x, y; training::Bool=true)
             nt += nb
             ps = out[:, gj[1], gi[1], a[1], b[1]]  # gj for y, gi for x
 
-
             for psi in 2:length(gj)
                 ps = hcat(ps, out[:, gj[psi], gi[psi], a[psi], b[psi]])
             end
@@ -223,6 +222,9 @@ function (model::Darknet)(x, y; training::Bool=true)
             )
 
             lbox += (sum(1.0 .- giou) ./ nb)
+
+            lcls += nll(ps[6:end, :], tcls[i])
+
         end
     end
 
