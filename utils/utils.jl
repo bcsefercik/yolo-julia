@@ -19,11 +19,10 @@ function build_targets(p, targets, model)
     end
 
     targets_reshaped = transpose(targets_reshaped)
-    targets_reshaped = convert(model.atype, targets_reshaped)
 
     nt = size(targets_reshaped)[1]
     tcls, tbox, indices, anch = [], [], [], []
-    gain = convert(model.atype, ones(1, 6))
+    gain = ones(1, 6)
 
     for (i, j) in enumerate(model.yolo_layers)
         # i: yolo_layer intra index (1, 2, 3)
