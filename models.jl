@@ -3,6 +3,7 @@ using Knet
 
 include("nn.jl")
 include("utils/parse_config.jl")
+include("utils/utils.jl")
 
 import .NN
 
@@ -125,14 +126,16 @@ struct Darknet
     routes
     yolo_layers
     verbose
+    atype
 
     function Darknet(
         cfg;
         img_size=(416, 416),
-        verbose=false
+        verbose=false,
+        atype=Knet.atype()
     )
         module_defs = parse_model_cfg(cfg)
-        module_list, routes = create_modules(module_defs, img_size)
+        module_list, routes = create_modules(module_defs, img_size; atype=atype)
 
         yolo_layers = [i for (i, m) in enumerate(module_list) if typeof(m) == YOLOLayer]
 
@@ -141,7 +144,8 @@ struct Darknet
             module_list,
             routes,
             yolo_layers,
-            verbose
+            verbose,
+            atype
         );
     end
 end
@@ -179,14 +183,35 @@ function (c::Darknet)(x; training=true)
     end
 end
 
-function (c::Darknet)(x, y; training::Bool=true)
-
+function (model::Darknet)(x, y; training::Bool=true)
     # TODO: Implement Loss
-    loss = 0.0
+    # p = yolo_out, targets = y, pi = out
+    yolo_out = model(x)  # p
+    lcls, lbox, lobj = 0.0, 0.0, 0.0
+    tcls, tbox, indices, anchors = build_targets(yolo_out, y, model)  # targets
 
-    yolo_out = c(x)
+    red = "mean"  # Loss reduction (sum or mean)
 
+    nt = 0
     for (i, out) in enumerate(yolo_out)
+        b, a, gj, gi = indices[i]
+
+        # TODO: convert to knet array
+        tobj = zeros(size(out)[2:end])  # target object
+
+        nb = size(b)[1]
+
+        if nb > 0
+            nt += nb
+            ps = out[:, gj, gi, a, b]  # gj for y, gi for x
+
+            return out, b, a, gj, gi
+        end
+
+
+
+
+
         bs = size(out)[end]
         yolo_re = reshape(out, (85, :, bs));
         y = rand(1:1, (1, size(yolo_re)[2:end]...))

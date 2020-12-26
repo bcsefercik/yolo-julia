@@ -53,8 +53,8 @@ function build_targets(p, targets, model; atype=Knet.atype())
             (
                 b,
                 a,
-                clamp.(gj, 1, gain[4]),
-                clamp.(gi, 1, gain[3])
+                Integer.(clamp.(gj, 1, gain[4])),
+                Integer.(clamp.(gi, 1, gain[3]))
             )
         )
 
