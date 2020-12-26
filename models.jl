@@ -1,11 +1,11 @@
 using Statistics
 
-using Knet: Data, sigm
-import Knet: sigm
+using Knet: Data
 
 include("nn.jl")
 include("utils/parse_config.jl")
 include("utils/utils.jl")
+include("hyper_params.jl")
 
 import .NN
 
@@ -79,7 +79,7 @@ function create_modules(module_defs, img_size; atype=Knet.atype())
             stride = [32, 16, 8]  # P5, P4, P3 strides
             layers = get(mdef, "from", [])
             anchors = mdef["anchors"][mdef["mask"], :]
-            modules = YOLOLayer(
+            modules = NN.YOLOLayer(
                 anchors,
                 mdef["classes"],
                 img_size,
@@ -139,7 +139,7 @@ struct Darknet
         module_defs = parse_model_cfg(cfg)
         module_list, routes = create_modules(module_defs, img_size; atype=atype)
 
-        yolo_layers = [i for (i, m) in enumerate(module_list) if typeof(m) == YOLOLayer]
+        yolo_layers = [i for (i, m) in enumerate(module_list) if typeof(m) == NN.YOLOLayer]
 
         return new(
             module_defs,
@@ -164,7 +164,7 @@ function (c::Darknet)(x; training=true)
         if layer_type in [NN.FeatureConcat, NN.WeightedFeatureFusion]
             x = layer(x, out)
 
-        elseif layer_type == YOLOLayer
+        elseif layer_type == NN.YOLOLayer
             push!(yolo_out, layer(x, out; training=training))
         else
             x = layer(x)
@@ -207,15 +207,13 @@ function (model::Darknet)(x, y; training::Bool=true)
             nt += nb
             ps = out[:, gj[1], gi[1], a[1], b[1]]  # gj for y, gi for x
 
-            # ps = Param(convert(Knet.atype(), ps))
 
             for psi in 2:length(gj)
                 ps = hcat(ps, out[:, gj[psi], gi[psi], a[psi], b[psi]])
             end
-            # pxy = tanh.(ps[1:2, :])
+
             pxy = sigm.(ps[1:2, :])
 
-            # pxy = ps[1:2, :]
             pwh = clamp.(exp.(ps[3:4, :]), 0, 1000) .* anchors[i]'
             pbox = cat(pxy, pwh; dims=1)  # vcat
 
@@ -225,9 +223,13 @@ function (model::Darknet)(x, y; training::Bool=true)
                 x1y1x2y2=false
             )
 
-            lbox = lbox + (sum(1.0 .- giou) ./ nb)
+            lbox += (sum(1.0 .- giou) ./ nb)
         end
     end
+
+    lbox *= PARAM_GIOU
+    lobj *= PARAM_OBJ
+    lcls *= PARAM_CLS
 
     loss = lbox + lobj + lcls
 
@@ -235,70 +237,10 @@ function (model::Darknet)(x, y; training::Bool=true)
 
 end
 
-# Batch loss
-# function (model::Darknet)(d::Data)
-#     loss = 0.0
-
-#     for (x, y) in d
-#         l = model(x, y)
-
-#         loss += l
-#     end
-# end
 (c::Darknet)(d::Data) = mean(c(x,y) for (x,y) in d)  # Batch loss
 
 
 
-mutable struct YOLOLayer
-    anchors
-    index
-    layers
-    stride
-    nl
-    na
-    nc
-    no
-    nx; ny; ng
-    anchor_vec
-    anchor_wh
-
-    function YOLOLayer(
-        anchors,
-        nc,
-        img_size,
-        yolo_index,
-        layers,
-        stride
-    )
-        na = size(anchors)[1]
-        ns = yolo_index * 13
-        anchor_vec = anchors ./ stride
-        return new(
-            anchors,
-            yolo_index,
-            layers,
-            stride,
-            length(layers),
-            na,
-            nc,
-            nc + 5,
-            ns, ns, (ns, ns),
-            anchor_vec,
-            reshape(anchor_vec, (1, na, 1, 1, 2))
-        )
-    end
-end
-
-function (c::YOLOLayer)(p, out; training=true)
-    ny, nx, _, bs = size(p)
-
-    r = reshape(p, (ny, nx, c.no, c.na, bs))
-    r = permutedims(r, (3, 1, 2, 4, 5))
-
-    if training
-        return r
-    end
-end
 
 
 # Hyperparameters

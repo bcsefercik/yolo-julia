@@ -1,4 +1,9 @@
-IOU_T = 0.20  # iou training threshold
+PARAM_IOU_T = 0.20  # iou training threshold
+
+PARAM_GIOU = 3.54  # giou loss gain
+PARAM_CLS = 37.4  # cls loss gain
+PARAM_OBJ = 64.3 * (416/320)  # obj loss gain (*=img_size/320 if img_size != 320)
+
 
 # hyp = {'giou': 3.54,  # giou loss gain
 #        'cls': 37.4,  # cls loss gain

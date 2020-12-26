@@ -35,7 +35,7 @@ function build_targets(p, targets, model)
         a, t, offsets = [], targets_reshaped .* gain, 0.0
 
         if nt > 0
-            j = wh_iou(anchors, t[:, 5:6]) .> IOU_T
+            j = wh_iou(anchors, t[:, 5:6]) .> PARAM_IOU_T
             tt = repeat(t, na)
             jj = vcat(j'...)
             a, t = at'[j'], tt[jj, :]

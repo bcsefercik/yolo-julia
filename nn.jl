@@ -220,75 +220,56 @@ function (c::WeightedFeatureFusion)(x, outputs)
 end
 
 
+mutable struct YOLOLayer
+    anchors
+    index
+    layers
+    stride
+    nl
+    na
+    nc
+    no
+    nx; ny; ng
+    anchor_vec
+    anchor_wh
 
-#=# TODO
-class WeightedFeatureFusion(nn.Module):  # weighted sum of 2 or more layers https://arxiv.org/abs/1911.09070
-    def __init__(self, layers, weight=False):
-        super(WeightedFeatureFusion, self).__init__()
-        self.layers = layers  # layer indices
-        self.n = len(layers) + 1  # number of layers
-
-    def forward(self, x, outputs):
-        # Weights
-        # Fusion
-        nx = x.shape[1]  # input channels
-        for i in range(self.n - 1):
-            a = outputs[self.layers[i]] * w[i + 1] if self.weight else outputs[self.layers[i]]  # feature to add
-            na = a.shape[1]  # feature channels
-
-            print("nx==na", nx == na)
-
-            if nx != na:
-                raise Exception
-
-            # Adjust channels
-            x = x + a
-
-        return x=#
-
-
-#=function (c::Upsample2d)(x)
-    xs = size(x)
-    sf = c.scale_factor
-
-    r = convert(
-        typeof(x),
-        zeros(
-            xs[1] * sf,
-            xs[2] * sf,
-            xs[3],
-            xs[4]
-        )
+    function YOLOLayer(
+        anchors,
+        nc,
+        img_size,
+        yolo_index,
+        layers,
+        stride
     )
-    rs = size(r)
-
-    if c.mode == "nearest"
-        for j in 1:sf
-            for i in 1:sf
-                r[i:sf:rs[1], j:sf:rs[2], :, :] = x
-            end
-        end
-    end
-
-    return r
-end=#
-
-
-#=struct Dense
-    w; b; f; p;
-
-    function Dense(inputsize::Int, outputsize::Int, f=relu;
-            pdrop=0, atype=dtype())
-
+        na = size(anchors)[1]
+        ns = yolo_index * 13
+        anchor_vec = anchors ./ stride
         return new(
-            param(outputsize, inputsize; atype=atype),
-            param0(outputsize; atype=atype),
-            f,
-            pdrop
+            anchors,
+            yolo_index,
+            layers,
+            stride,
+            length(layers),
+            na,
+            nc,
+            nc + 5,
+            ns, ns, (ns, ns),
+            anchor_vec,
+            reshape(anchor_vec, (1, na, 1, 1, 2))
         )
     end
 end
 
-(d::Dense)(x) = d.f.(d.w * mat(dropout(x, d.p)) .+ d.b)
-=#
+function (c::YOLOLayer)(p, out; training=true)
+    ny, nx, _, bs = size(p)
+
+    r = reshape(p, (ny, nx, c.no, c.na, bs))
+    r = permutedims(r, (3, 1, 2, 4, 5))
+
+    if training
+        return r
+    end
+end
+
+
 end  ## NN module end
