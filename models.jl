@@ -190,7 +190,7 @@ function (c::Darknet)(x; training=true)
             no, ny, nx, na, bs = size(out)
 
             yv, xv = meshgrid(1:ny, 1:nx)
-            grid = cat(xv, yv, dims=3)
+            grid = cat(yv, xv, dims=3)
             grid = permutedims(grid, (3, 1, 2))
             grid = reshape(grid, (2, ny, nx, 1, 1))
             grid = convert(c.atype, grid)
@@ -251,15 +251,17 @@ function (model::Darknet)(x, y; training::Bool=true)
             )
 
             for ti in 1:length(gj)
-                tobj[gi[ti], gj[ti], a[ti], b[ti]] = 1
+                tobj[gj[ti], gi[ti], a[ti], b[ti]] = 1
             end
 
             lbox += (sum(1.0 .- giou) ./ nb)
 
             lcls += nll(ps[6:end, :], tcls[i]; average=red=="mean")
+
         end
 
-        lobj += bce(out[5, :, :, :, :][:], tobj[:])
+        return out, tobj
+        lobj += bce(out[5, :, :, :, :][:], tobj[:]; average=red=="mean")
     end
 
     lbox *= PARAM_GIOU

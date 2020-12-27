@@ -138,3 +138,17 @@ function meshgrid(x, y)
 
    return X, Y
 end
+
+
+function nms(prediction, conf_thres=0.1, iou_thres=0.6)
+    min_wh, max_wh = 2, 4096
+    bs = size(prediction)[3]
+    n = size(prediction)[2]
+    nc = n - 5
+
+    for xi in 1:bs
+        x = out[:, :, xi]
+        # x = x[x[5, :] .> conf_thres]
+        return x
+    end
+end
