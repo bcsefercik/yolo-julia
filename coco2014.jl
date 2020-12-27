@@ -16,11 +16,11 @@ struct COCO14Data
 
     function COCO14Data(
         images::String, label_file::String;
-        raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}
+        raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}, indices=nothing
     )
         x, y = load_data_raw(
             images, label_file;
-            raw_labels=raw_labels, class_file=class_file, dtype=dtype
+            raw_labels=raw_labels, class_file=class_file, dtype=dtype, indices=indices
         )
         return new(x, y)
     end

@@ -43,7 +43,7 @@ end
 
 function load_data_raw(
     images::String, label_file::String;
-    raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}
+    raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}, indices=nothing
 )
 
     x = nothing
@@ -71,6 +71,10 @@ function load_data_raw(
 
     # Read images
     for (root, _, files) in walkdir(images)
+        if indices != nothing
+            files = files[indices]
+        end
+
         p = ProgressMeter.Progress(length(files), 1)
         for (i, img_path) in enumerate(files)
             # println("Loading: ", img_path)
