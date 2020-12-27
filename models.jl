@@ -200,7 +200,7 @@ function (model::Darknet)(x, y; training::Bool=true)
         b, a, gj, gi = indices[i]
 
         # TODO: convert to knet array
-        tobj = zeros(size(out)[2:end])  # target object
+        tobj = zeros(Integer, size(out)[2:end])  # target object
 
         nb = size(b)[1]
         if nb > 0
@@ -221,11 +221,16 @@ function (model::Darknet)(x, y; training::Bool=true)
                 x1y1x2y2=false
             )
 
+            for ti in 1:length(gj)
+                tobj[gj[ti], gi[ti], a[ti], b[ti]] = 1
+            end
+
             lbox += (sum(1.0 .- giou) ./ nb)
 
-            lcls += nll(ps[6:end, :], tcls[i])
-
+            lcls += nll(ps[6:end, :], tcls[i]; average=red=="mean")
         end
+
+        lobj += bce(out[5, :, :, :, :][:], tobj[:])
     end
 
     lbox *= PARAM_GIOU
