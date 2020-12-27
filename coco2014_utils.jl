@@ -1,5 +1,6 @@
 import JSON
 import Images
+import ProgressMeter
 
 function coco_to_yolo_bbox(coco_bbox, width, height)
     bbox::Array{Float64} = [0, 0, 0, 0]
@@ -40,10 +41,10 @@ function read_image(image_path::String, img_size=(416, 416); dtype=Array{Float32
 end
 
 
-function load_data(
+function load_data_raw(
     images::String, label_file::String;
     raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}
-    )
+)
 
     x = nothing
     y = []
@@ -70,8 +71,8 @@ function load_data(
 
     # Read images
     for (root, _, files) in walkdir(images)
-        for img_path in files
-
+        p = ProgressMeter.Progress(length(files), 1)
+        for (i, img_path) in enumerate(files)
             # println("Loading: ", img_path)
 
             x_curr = read_image(joinpath(root, img_path), dtype=dtype)
@@ -95,6 +96,8 @@ function load_data(
             end
 
             push!(y, y_curr)
+
+            ProgressMeter.update!(p, i)
         end
     end
 
@@ -145,7 +148,10 @@ function convert_annotations_to_labels(annotation_file::String; kwargs...)
         end
     end
 
-    for ann in annotations["annotations"]
+
+    p = ProgressMeter.Progress(length(annotations["annotations"]) + 1, 1)
+
+    for (i, ann) in enumerate(annotations["annotations"])
         file_name = images[ann["image_id"]][1]
         if !haskey(labels, file_name)
             labels[file_name] = []
@@ -161,13 +167,20 @@ function convert_annotations_to_labels(annotation_file::String; kwargs...)
                 )...
             ]
         )
+        ProgressMeter.update!(p, i)
     end
 
     if haskey(kwargs, :out)
         open(kwargs[:out], "w") do io
             JSON.print(io, labels)
         end
+
+        @info "Saved to: $kwargs[:out]"
     end
+
+    ProgressMeter.update!(p, length(annotations["annotations"]) + 1)
+
+    @info "Loaded customized labels."
 
     return labels
 end
