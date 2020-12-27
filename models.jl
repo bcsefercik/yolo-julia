@@ -165,7 +165,7 @@ function (c::Darknet)(x; training=true)
             x = layer(x, out)
 
         elseif layer_type == NN.YOLOLayer
-            push!(yolo_out, layer(x, out; training=training))
+            push!(yolo_out, layer(x, out))
         else
             x = layer(x)
         end
@@ -181,12 +181,41 @@ function (c::Darknet)(x; training=true)
     if training
         return yolo_out
     else
-        return x
+
+        results = nothing
+
+        for (i, out) in enumerate(yolo_out)
+            layer_id = c.yolo_layers[i]
+
+            no, ny, nx, na, bs = size(out)
+
+            yv, xv = meshgrid(1:ny, 1:nx)
+            grid = cat(xv, yv, dims=3)
+            grid = permutedims(grid, (3, 1, 2))
+            grid = reshape(grid, (2, ny, nx, 1, 1))
+            grid = convert(c.atype, grid)
+
+            io = deepcopy(out)
+            io[1:2,:,:,:,:] = sigm.(io[1:2,:,:,:,:]) .+ grid
+            io[3:4,:,:,:,:] = exp.(io[3:4,:,:,:,:]) .* c.module_list[layer_id].anchor_wh
+            io[1:4,:,:,:,:] = io[1:4,:,:,:,:] .* c.module_list[layer_id].stride
+            io[5:end,:,:,:,:] = sigm.(io[5:end,:,:,:,:])
+
+            r = reshape(io, (no, :, bs))
+
+            if results == nothing
+                results = r
+            else
+                results = cat(results, r, dims=2)
+            end
+        end
+
+        return results
+
     end
 end
 
 function (model::Darknet)(x, y; training::Bool=true)
-    # TODO: Implement Loss
     # p = yolo_out, targets = y, pi = out
     yolo_out = model(x)  # p
     losses = convert(model.atype, zeros(3))
@@ -222,7 +251,7 @@ function (model::Darknet)(x, y; training::Bool=true)
             )
 
             for ti in 1:length(gj)
-                tobj[gj[ti], gi[ti], a[ti], b[ti]] = 1
+                tobj[gi[ti], gj[ti], a[ti], b[ti]] = 1
             end
 
             lbox += (sum(1.0 .- giou) ./ nb)

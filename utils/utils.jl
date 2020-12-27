@@ -130,3 +130,11 @@ function bbox_giou(box1, box2; x1y1x2y2=false)
 
     return iou .- ((c_area .- uni) ./ c_area)
 end
+
+
+function meshgrid(x, y)
+   X = [i for i in x, j in 1:length(y)]
+   Y = [j for i in 1:length(x), j in y]
+
+   return X, Y
+end

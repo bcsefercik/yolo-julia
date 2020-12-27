@@ -7,7 +7,7 @@ import FileIO
 
 import JSON
 
-include("coco2014_utils.jl")
+include("utils/coco2014_utils.jl")
 
 
 struct COCO14Data

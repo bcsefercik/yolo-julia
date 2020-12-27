@@ -232,6 +232,7 @@ mutable struct YOLOLayer
     nx; ny; ng
     anchor_vec
     anchor_wh
+    atype
 
     function YOLOLayer(
         anchors,
@@ -239,7 +240,8 @@ mutable struct YOLOLayer
         img_size,
         yolo_index,
         layers,
-        stride
+        stride;
+        atype=Knet.atype()
     )
         na = size(anchors)[1]
         ns = yolo_index * 13
@@ -255,20 +257,19 @@ mutable struct YOLOLayer
             nc + 5,
             ns, ns, (ns, ns),
             anchor_vec,
-            reshape(anchor_vec, (1, na, 1, 1, 2))
+            convert(atype, reshape(anchor_vec', (2, 1, 1, na, 1))),
+            atype
         )
     end
 end
 
-function (c::YOLOLayer)(p, out; training=true)
+function (c::YOLOLayer)(p, out)
     ny, nx, _, bs = size(p)
 
     r = reshape(p, (ny, nx, c.no, c.na, bs))
     r = permutedims(r, (3, 1, 2, 4, 5))
 
-    if training
-        return r
-    end
+    return r
 end
 
 
