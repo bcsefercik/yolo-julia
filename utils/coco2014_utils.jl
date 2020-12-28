@@ -74,8 +74,12 @@ function load_data_raw(
     # Read images
     for (root, _, files) in walkdir(images)
         if indices != nothing
-            randind = randperm(length(files))
-            files = files[randind[indices]]
+            if shuffle
+                randind = randperm(length(files))
+                indices = randind[indices]
+            end
+
+            files = files[indices]
         end
 
         p = ProgressMeter.Progress(length(files), 1)
