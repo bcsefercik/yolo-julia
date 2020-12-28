@@ -101,20 +101,22 @@ function main()
 
     @info "Starting training."
     for ep in 1:outer_epoch
-        for (ti, tpath) in enumerate(tdata_path)
+        for (ti, tpath) in enumerate(trndata_paths)
             trndata, dtrn = nothing, nothing
 
             trndata = load_data(tpath)
+            println(size(trndata.x))
+            println(size(trndata.y))
             dtrn = minibatch(
-                valdata.x,
-                valdata.y,
+                trndata.x,
+                trndata.y,
                 8;
                 xsize = (416,416,3,:),
                 xtype=Knet.atype()
             );
 
             itl, itmap, ivl, ivmap, best_val_loss = train!(
-                model, train_data=dtrn, val_data=dval;
+                model, dtrn, dval;
                 period=args["period"], epoch=instance_epoch, lr=args["lr"],
                 optimizer=adam, filename=args["model-out"], bestloss=best_val_loss
             )
