@@ -1,3 +1,5 @@
+using Random
+
 import JSON
 import Images
 import ProgressMeter
@@ -43,7 +45,7 @@ end
 
 function load_data_raw(
     images::String, label_file::String;
-    raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}, indices=nothing
+    raw_labels::Bool=false, class_file::String="", dtype=Array{Float32}, indices=nothing, shuffle=false
 )
 
     x = nothing
@@ -72,7 +74,8 @@ function load_data_raw(
     # Read images
     for (root, _, files) in walkdir(images)
         if indices != nothing
-            files = files[indices]
+            randind = randperm(length(files))
+            files = files[randind[indices]]
         end
 
         p = ProgressMeter.Progress(length(files), 1)
