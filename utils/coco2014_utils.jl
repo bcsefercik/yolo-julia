@@ -195,3 +195,15 @@ function convert_annotations_to_labels(annotation_file::String; kwargs...)
 
     return labels
 end
+
+
+function merge_data(data_path_list)
+    data = load_data(data_path_list[1])
+    for (i, tv) in enumerate(data_path_list[2:end])
+        data_instance = load_data(tv)
+        data.x = cat(data.x, data_instance.x; dims=4)
+        append!(data.y, data_instance.y)
+    end
+
+    return data
+end

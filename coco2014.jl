@@ -10,7 +10,7 @@ import JSON
 include("utils/coco2014_utils.jl")
 
 
-struct COCO14Data
+mutable struct COCO14Data
     x
     y
 

@@ -1,6 +1,6 @@
 using Knet
 
-include("../hyper_params.jl")
+include("../cfg/hyper_params.jl")
 
 
 function clamp_(x, lo, hi)
