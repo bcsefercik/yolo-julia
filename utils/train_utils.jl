@@ -1,3 +1,5 @@
+import IterTools: ncycle
+
 using Knet
 import Knet: train!
 
