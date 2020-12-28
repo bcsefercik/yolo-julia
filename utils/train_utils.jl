@@ -1,3 +1,4 @@
+import FileIO
 import IterTools: ncycle
 
 using Knet
@@ -6,10 +7,12 @@ import Knet: train!
 
 function train!(model, train_data::Data, val_data::Data;
                 period::Int=5, epoch::Int=10, lr=0.001,
-                optimizer=adam, filename::String=""
+                optimizer=adam, filename::String="", bestloss=nothing
 )
 
-    bestloss = model(val_data)
+    if bestloss == nothing
+        bestloss = model(val_data)
+    end
 
     trn_loss = []
     trn_map = []
@@ -31,5 +34,11 @@ function train!(model, train_data::Data, val_data::Data;
         return "tl: $(round(trn_loss[end], digits=2)), vl: $(round(val_loss[end], digits=2)), bl: $(round(bestloss, digits=2))"
     end
 
-    return trn_loss, trn_map, val_loss, val_map
+    return trn_loss, trn_map, val_loss, val_map, bestloss
 end
+
+
+function save_results()
+
+end
+

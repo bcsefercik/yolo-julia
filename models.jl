@@ -6,7 +6,7 @@ using Knet: Data
 include("nn.jl")
 include("utils/parse_config.jl")
 include("utils/utils.jl")
-include("hyper_params.jl")
+include("cfg/hyper_params.jl")
 
 import .NN
 
@@ -130,6 +130,7 @@ struct Darknet
     end
 end
 
+
 function (c::Darknet)(x; training=true)
     img_size = size(x)[1:2]
     yolo_out, out = [], []
@@ -167,7 +168,7 @@ function (c::Darknet)(x; training=true)
 
             no, ny, nx, na, bs = size(out)
 
-            yv, xv = meshgrid(1:ny, 1:nx)
+            yv, xv = meshgrid(0:ny-1, 0:nx-1)
             grid = cat(yv, xv, dims=3)
             grid = permutedims(grid, (3, 1, 2))
             grid = reshape(grid, (2, ny, nx, 1, 1))
@@ -176,6 +177,9 @@ function (c::Darknet)(x; training=true)
             io = deepcopy(out)
             io[1:2,:,:,:,:] = sigm.(io[1:2,:,:,:,:]) .+ grid
             io[3:4,:,:,:,:] = exp.(io[3:4,:,:,:,:]) .* c.module_list[layer_id].anchor_wh
+            temp = io[3,:,:,:,:]
+            io[3,:,:,:,:] = io[4,:,:,:,:]
+            io[4,:,:,:,:] = temp
             io[1:4,:,:,:,:] = io[1:4,:,:,:,:] .* c.module_list[layer_id].stride
             io[5:end,:,:,:,:] = sigm.(io[5:end,:,:,:,:])
 
@@ -192,6 +196,7 @@ function (c::Darknet)(x; training=true)
 
     end
 end
+
 
 function (model::Darknet)(x, y; training::Bool=true)
     # p = yolo_out, targets = y, pi = out
