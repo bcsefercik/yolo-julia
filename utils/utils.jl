@@ -132,9 +132,51 @@ function bbox_giou(box1, box2; x1y1x2y2=false)
 end
 
 
+function xywh2xyxy(x)
+    # Convert nx4 boxes from [x, y, w, h] to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
+    y = convert(typeof(x), zeros(size(x)))
+
+    y[1, :] = x[1, :] - (x[3, :] ./ 2)  # top left x
+    y[2, :] = x[2, :] - (x[4, :] ./ 2)  # top left y
+    y[3, :] = x[1, :] + (x[3, :] ./ 2)  # bottom right x
+    y[4, :] = x[2, :] + (x[4, :] ./ 2)  # bottom right y
+
+    return y
+end
+
+
 function meshgrid(x, y)
    X = [i for i in x, j in 1:length(y)]
    Y = [j for i in 1:length(x), j in y]
 
    return X, Y
+end
+
+
+function nms(prediction; conf_thres=0.1, iou_thres=0.6)
+    min_wh, max_wh = 2, 4096
+    bs = size(prediction)[3]
+    n = size(box)[2]
+    nc = n - 5
+
+    min_wh, max_wh = 2, 4096
+
+    for xi in 1:bs
+        x = out[:, :, xi]
+
+        x = x[:, x[5, :] .> conf_thres]
+        x = x[:, x[3, :] .> min_wh]
+        x = x[:, x[4, :] .> min_wh]
+        x = x[:, x[3, :] .< max_wh]
+        x = x[:, x[4, :] .< max_wh]
+
+        if length(x) == 0; continue; end
+
+        x[6:end, :] = x[6:end, :] .* x[5:5, :]  # conf = obj_conf * cls_conf
+
+        box = xywh2xyxy(x[1:4, :])
+
+
+        return box
+    end
 end

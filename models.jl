@@ -1,4 +1,5 @@
 using Statistics
+import FileIO
 
 using Knet: Data
 
@@ -61,10 +62,6 @@ function create_modules(module_defs, img_size; atype=Knet.atype())
             layers = mdef["layers"]
             filters = sum([output_filters[l > 1 ? l + 1 : length(output_filters) + l] for l in layers])
             append!(routes, [l < 1 ? i + l - 1 : l for l in layers])
-
-            # println(i, layers, filters, [l < 1 ? i + l - 1 : l for l in layers])
-            # println(length(output_filters), [l > 1 ? l + 1 : length(output_filters) + l for l in layers])
-
             modules = NN.FeatureConcat(layers)
 
         elseif mdef["type"] == "shortcut"
@@ -87,25 +84,6 @@ function create_modules(module_defs, img_size; atype=Knet.atype())
                 layers,
                 stride[yolo_index]
             )
-
-
-
-            # Initialize preceding Conv2d() bias (https://arxiv.org/pdf/1708.02002.pdf section 3.3)
-            #=try
-                j = get(mdef, "from", 0)
-                j = j < 1 ? j + length(module_list) : j
-
-                bias_ = value(module_list[j].layers[1].b)
-                bias = bias_[:, :, 1:modules.no * modules.na, :]
-                bias = reshape(bias, (modules.na, :))
-                bias[:, 5] = bias[:, 5] .- 4.5
-                bias[:, 6:end] = bias[:, 6:end] .+ log(0.6 / (modules.nc - 0.99))
-                bias = reshape(bias, (1, 1, :, 1))
-                module_list[j].layers[1].b = Param(convert(atype, bias))
-
-            catch y
-                println("WARNING: smart bias initialization failure. ", y)
-            end=#
 
         else
             println("Warning: Unrecognized Layer Type: ", mdef["type"])
@@ -190,7 +168,7 @@ function (c::Darknet)(x; training=true)
             no, ny, nx, na, bs = size(out)
 
             yv, xv = meshgrid(1:ny, 1:nx)
-            grid = cat(xv, yv, dims=3)
+            grid = cat(yv, xv, dims=3)
             grid = permutedims(grid, (3, 1, 2))
             grid = reshape(grid, (2, ny, nx, 1, 1))
             grid = convert(c.atype, grid)
@@ -251,15 +229,16 @@ function (model::Darknet)(x, y; training::Bool=true)
             )
 
             for ti in 1:length(gj)
-                tobj[gi[ti], gj[ti], a[ti], b[ti]] = 1
+                tobj[gj[ti], gi[ti], a[ti], b[ti]] = 1
             end
 
             lbox += (sum(1.0 .- giou) ./ nb)
 
             lcls += nll(ps[6:end, :], tcls[i]; average=red=="mean")
+
         end
 
-        lobj += bce(out[5, :, :, :, :][:], tobj[:])
+        lobj += bce(out[5, :, :, :, :][:], tobj[:]; average=red=="mean")
     end
 
     lbox *= PARAM_GIOU
@@ -274,7 +253,16 @@ end
 
 (c::Darknet)(d::Data) = mean(c(x,y) for (x,y) in d)  # Batch loss
 
+function save_model(model::Darknet, filename::String)
+    FileIO.save(filename, "darknet59", model)
+    @info "Saved to: $filename."
+end
 
+function load_model(filename::String)
+    model_d = FileIO.load(filename)
+    @info "Loaded: $filename."
+    return model_d["darknet59"]
+end
 
 
 
