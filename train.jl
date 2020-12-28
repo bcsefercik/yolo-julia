@@ -105,8 +105,6 @@ function main()
             trndata, dtrn = nothing, nothing
 
             trndata = load_data(tpath)
-            println(size(trndata.x))
-            println(size(trndata.y))
             dtrn = minibatch(
                 trndata.x,
                 trndata.y,

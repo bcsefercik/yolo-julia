@@ -204,7 +204,6 @@ function merge_data(data_path_list)
         data.x = cat(data.x, data_instance.x; dims=4)
         append!(data.y, data_instance.y)
     end
-    @info "Merged all data."
 
     return data
 end
