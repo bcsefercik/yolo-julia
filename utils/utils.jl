@@ -11,10 +11,23 @@ end
 function build_targets(p, targets, model)
     # p: yolo_outs
 
+    tcls, tbox, indices, anch = [], [], [], []
+
+    if length(targets) == 0
+        return tcls, tbox, indices, anch
+    end
+    
+    
+
     targets_reshaped = hcat(targets[1]...)
     targets_reshaped = vcat(ones(1, length(targets[1])), targets_reshaped)
-
+    
+    try
+        
     for (i, target) in enumerate(targets[2:end])
+        if length(target) == 0
+            continue
+        end
         targets_reshaped = hcat(
             targets_reshaped,
             vcat(
@@ -22,6 +35,12 @@ function build_targets(p, targets, model)
                 hcat(target...)
             )
         )
+    end
+        
+        
+    catch e
+       println(length(targets))
+       println(targets)
     end
 
     targets_reshaped = transpose(targets_reshaped)
