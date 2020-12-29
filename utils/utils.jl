@@ -144,7 +144,7 @@ function bbox_giou(box1, box2; x1y1x2y2=false)
 end
 
 
-function xywh2xyxy(x)
+function xywh2xyxy_p(x)
     # Convert nx4 boxes from [x, y, w, h] to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
     y = convert(typeof(x), zeros(size(x)))
 
@@ -165,16 +165,19 @@ function meshgrid(x, y)
 end
 
 
-function nms(prediction; conf_thres=0.1, iou_thres=0.6)
+function nms(prediction; conf_thres=0.5, iou_thres=0.6)
+
     min_wh, max_wh = 2, 4096
     bs = size(prediction)[3]
-    n = size(box)[2]
+    n = size(prediction)[1]
     nc = n - 5
 
     min_wh, max_wh = 2, 4096
 
+    results = []
+
     for xi in 1:bs
-        x = out[:, :, xi]
+        x = prediction[:, :, xi]
 
         x = x[:, x[5, :] .> conf_thres]
         x = x[:, x[3, :] .> min_wh]
@@ -186,9 +189,91 @@ function nms(prediction; conf_thres=0.1, iou_thres=0.6)
 
         x[6:end, :] = x[6:end, :] .* x[5:5, :]  # conf = obj_conf * cls_conf
 
-        box = xywh2xyxy(x[1:4, :])
+
+        x[1:4, :] = xywh2xyxy_p(x[1:4, :])
 
 
-        return box
+        dets = Dict{Integer, Any}()
+
+        class_candidates = findall(
+            o->o==1,
+            x[6:end, :] .> conf_thres
+        )
+
+
+        # class_candidates = argmax(x[6:end, :], dims=1)
+        # println(class_candidates)
+        # return class_candidates
+
+        # distribute detections to classes
+        for cc in class_candidates
+            if !haskey(dets, cc[1])
+                dets[cc[1]] = x[1:5, cc[2]]
+            else
+                dets[cc[1]] = cat(
+                    dets[cc[1]],
+                    x[1:5, cc[2]],
+                    dims=2
+                )
+            end
+        end
+
+        result = []
+
+        for (k, v) in dets
+            nmsed = nms_class(v, iou_thres=iou_thres)
+
+            nmsed = cat(reshape(repeat([k], size(nmsed)[2]), (1, :)), nmsed,  dims=1)
+
+            for jj in 1:size(nmsed)[2]
+                push!(result, nmsed[:, jj])
+            end
+        end
+
+        push!(results, result)
+
     end
+
+    return results
+end
+
+function nms_class(p; iou_thres=0.6)
+    # xyxyc
+
+    x1 = p[1, :]
+    y1 = p[2, :]
+    x2 = p[3, :]
+    y2 = p[4, :]
+
+    area = (x2 - x1 .+ 1) .* (y2 - y1 .+ 1)
+
+    idxs = sortperm(p[5, :])
+    pick = Array{Integer}([])
+
+    while length(idxs) > 0
+        lst = length(idxs)
+        i = idxs[lst]
+        push!(pick, i)
+
+        xx1 = max.(x1[i], x1[idxs[1:lst-1]])
+        yy1 = max.(y1[i], y1[idxs[1:lst-1]])
+        xx2 = max.(x2[i], x2[idxs[1:lst-1]])
+        yy2 = max.(y2[i], y2[idxs[1:lst-1]])
+
+        w = max.(0, xx2 - xx1 .+ 1)
+        h = max.(0, yy2 - yy1 .+ 1)
+
+        overlap = (w .* h) ./ area[idxs[1:lst-1]]
+        deleteat!(
+            idxs,
+            cat(
+                [i for (i, v) in enumerate(overlap) if v > iou_thres],
+                lst,
+                dims=1
+            )
+        )
+
+    end
+
+    return p[1:end, pick]
 end

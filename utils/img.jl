@@ -1,6 +1,8 @@
 import Images
 import ImageDraw
 
+include("constants.jl")
+
 function get_image_and_labels(name, labels, images_path="."; img_size=nothing)
     img = Images.load(joinpath(images_path, "$name.jpg"));
 
