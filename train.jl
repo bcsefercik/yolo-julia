@@ -87,7 +87,7 @@ function main()
     dval = minibatch(
         valdata.x,
         valdata.y,
-        16;
+        2;
         xsize = (416,416,3,:),
         xtype=Knet.atype()
     );
