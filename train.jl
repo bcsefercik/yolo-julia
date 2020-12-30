@@ -117,7 +117,7 @@ function main()
                 model, dtrn, dval;
                 period=args["period"], epoch=instance_epoch, lr=args["lr"],
                 optimizer=adam, filename=args["model-out"], bestloss=best_val_loss,
-                results_filename="$(tpah)_$(args["results"])"
+                results_filename="$(tpath)_$(args["results"])"
             )
 
             append!(trn_loss, itl)
