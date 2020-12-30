@@ -7,7 +7,8 @@ import Knet: train!
 
 function train!(model, train_data::Data, val_data::Data;
                 period::Int=5, epoch::Int=10, lr=0.001,
-                optimizer=adam, filename::String="", bestloss=nothing
+                optimizer=adam, filename::String="", bestloss=nothing,
+                results_filename::String=""
 )
 
     if bestloss == nothing
@@ -31,6 +32,10 @@ function train!(model, train_data::Data, val_data::Data;
             end
         end
 
+        if results_filename != ""
+            save_results(results_filename, trn_loss, trn_map, val_loss, val_map, bestloss)
+        end
+
         return "tl: $(round(trn_loss[end], digits=2)), vl: $(round(val_loss[end], digits=2)), bl: $(round(bestloss, digits=2))"
     end
 
@@ -38,7 +43,14 @@ function train!(model, train_data::Data, val_data::Data;
 end
 
 
-function save_results()
-
+function save_results(filename, results...)
+    FileIO.save(
+        filename,
+        "trn_loss", results[1],
+        "trn_map", results[2],
+        "val_loss", results[3],
+        "val_map", results[4],
+        "bestloss", results[5]
+    )
 end
 

@@ -116,7 +116,8 @@ function main()
             itl, itmap, ivl, ivmap, best_val_loss = train!(
                 model, dtrn, dval;
                 period=args["period"], epoch=instance_epoch, lr=args["lr"],
-                optimizer=adam, filename=args["model-out"], bestloss=best_val_loss
+                optimizer=adam, filename=args["model-out"], bestloss=best_val_loss,
+                results_filename="$(tpah)_$(args["results"])"
             )
 
             append!(trn_loss, itl)
