@@ -167,6 +167,13 @@ end
 
 function nms(prediction; conf_thres=0.5, iou_thres=0.6)
 
+    temp = prediction[3,:,:,:,:]
+    prediction[3,:,:,:,:] = prediction[4,:,:,:,:]
+    prediction[4,:,:,:,:] = temp
+    temp = prediction[1,:,:,:,:]
+    prediction[1,:,:,:,:] = prediction[2,:,:,:,:]
+    prediction[2,:,:,:,:] = temp
+
     min_wh, max_wh = 2, 4096
     bs = size(prediction)[3]
     n = size(prediction)[1]
