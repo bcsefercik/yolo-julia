@@ -1,7 +1,10 @@
 import Images
 import ImageDraw
+import Plots
 
 include("constants.jl")
+
+shown_img_type = Array{RGB{Normed{UInt8,8}},2}
 
 function get_image_and_labels(name, labels, images_path="."; img_size=nothing)
     img = Images.load(joinpath(images_path, "$name.jpg"));
@@ -52,8 +55,50 @@ function draw_labels(img, labels; img_size=(416, 416))
     polygons = get_polygons(labels; img_size=img_size)
 
     for p in polygons
-        img = ImageDraw.draw(img, p)
+        img = ImageDraw.draw(img, p, LABEL_COLOR)
     end
 
     return img
+end
+
+function draw_results(x, y_pred, y_gold=nothing, font_size=10)
+    A = permutedims(x, (3,1,2))
+    img = colorview(RGB, A)
+
+    img = convert(shown_img_type, img);
+
+    y_pred_int = map(o -> Integer.(round.(o)), y_pred)
+
+    for i in 1:length(y_pred)
+        r = y_pred_int[i]
+        x1, y1, x2, y2 = r[2], r[3], r[4], r[5]
+
+        pol = get_polygon(x1, y1, x2, y2)
+
+        ImageDraw.draw!(img, pol, COLORS[r[1]])
+    end
+
+    if y_gold != nothing
+        img = draw_labels(img, y_gold)
+    end
+
+    p = Plots.plot(img, size=(416, 416), axis=nothing)
+
+    for i in 1:length(y_pred)
+        r = y_pred_int[i]
+        x1, y1 = r[2], r[3]
+        Plots.annotate!(
+            p,
+            x1,
+            y1 - font_size,
+            text(
+                CLASS_NAMES_R[r[1]],
+                COLORS[r[1]],
+                :left,
+                font_size
+            )
+        )
+    end
+
+    return p
 end

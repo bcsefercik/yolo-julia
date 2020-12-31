@@ -1,6 +1,7 @@
 import JSON
+import FileIO
 
-using Colors
+import Images: N0f8, RGB
 
 
 CLASS_MAP = JSON.parsefile(
@@ -24,4 +25,10 @@ for (k, v) in CLASS_MAP
     CLASS_NAMES_R[v] = CLASS_NAMES[k]
 end
 
-COLORS = [RGB{N0f8}(rand(3)...) for (_, _) in CLASS_NAMES_R]
+COLORS = FileIO.load("../colors.jld2")["COLORS"]
+
+# To generate new colors for classes use following line
+# COLORS = [RGB{N0f8}(rand(3)...) for (_, _) in CLASS_NAMES_R]
+
+LABEL_COLOR = RGB{N0f8}(0.95,1,0.95)
+PRED_COLOR = RGB{N0f8}(0.1,0.4,0.9)
