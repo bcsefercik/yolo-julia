@@ -4,8 +4,6 @@ import ProgressMeter
 
 include("utils.jl")
 include("constants.jl")
-include("../models.jl")
-include("../coco2014.jl")
 
 # Adopted from: https://medium.com/analytics-vidhya/understanding-the-map-mean-average-precision-evaluation-metric-for-object-detection-432f5cca53b7
 # Faster RCNN version
@@ -13,7 +11,7 @@ include("../coco2014.jl")
 MINOVERLAP = 0.5  # default value (defined in the PASCAL VOC2012 challenge)
 
 
-function compute_mAP(model::Darknet, data::COCO14Data)
+function compute_mAP(model, data; conf_thres=0.8)
     b = 13
     bs = 8
     batch_count = floor(Integer, length(data)/bs)
@@ -22,7 +20,7 @@ function compute_mAP(model::Darknet, data::COCO14Data)
     p = ProgressMeter.Progress(batch_count-1, 1)
     for b in 1:batch_count-1
         xx, yy = convert(Knet.atype(), data.x[:, :, :, 1+(b-1)*bs:b*bs]), data.y[1+(b-1)*bs:b*bs]
-        result = model(xx, training=false, conf_thres=0.8);
+        result = model(xx, training=false, conf_thres=conf_thres);
         mAP, _ = compute_mAP(result, yy)
         sum_mAP += mAP
 

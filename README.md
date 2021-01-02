@@ -44,7 +44,7 @@ darknet = load_model(<model_jld2_filepath>)
 
 __Inference__
 ```
-bboxes = darknet(<image_float32_array>; training=false)
+bbox_predictions = darknet(<image_float32_array>; training=false)
 ```
 
 __Loss__
@@ -52,9 +52,10 @@ __Loss__
 loss = darknet(<image_float32_array>, <label_array>)
 ```
 
-__Average Precision__
+__(Mean) Average Precision__
 ```
-loss = darknet(<image_float32_array>, <label_array>; training=false)
+include("utils/map.jl")
+mAP, _ = compute_mAP(bbox_predictions, <label_array>)
 ```
 
 ### train.jl
@@ -101,5 +102,5 @@ import .NN
 
 ## Visual Tools
 ```
-TODO
+Please refer to utils/img.jl.
 ```
