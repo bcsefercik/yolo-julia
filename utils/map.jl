@@ -13,13 +13,13 @@ include("../coco2014.jl")
 MINOVERLAP = 0.5  # default value (defined in the PASCAL VOC2012 challenge)
 
 
-function compute_mAP(model::Darknet, data::COCO2014Data)
+function compute_mAP(model::Darknet, data::COCO14Data)
     b = 13
     bs = 8
     batch_count = floor(Integer, length(data)/bs)
 
     sum_mAP = 0.0
-    p = ProgressMeter.Progress(batch_count, 1)
+    p = ProgressMeter.Progress(batch_count-1, 1)
     for b in 1:batch_count-1
         xx, yy = convert(Knet.atype(), data.x[:, :, :, 1+(b-1)*bs:b*bs]), data.y[1+(b-1)*bs:b*bs]
         result = model(xx, training=false, conf_thres=0.8);
