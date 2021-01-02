@@ -177,9 +177,9 @@ function (c::Darknet)(x; training=true)
             io = deepcopy(out)
             io[1:2,:,:,:,:] = sigm.(io[1:2,:,:,:,:]) .+ grid
             io[3:4,:,:,:,:] = exp.(io[3:4,:,:,:,:]) .* c.module_list[layer_id].anchor_wh
-            temp = io[3,:,:,:,:]
-            io[3,:,:,:,:] = io[4,:,:,:,:]
-            io[4,:,:,:,:] = temp
+            temp = deepcopy(io[1,:,:,:,:])
+            io[1,:,:,:,:] = io[2,:,:,:,:]
+            io[2,:,:,:,:] = temp
             io[1:4,:,:,:,:] = io[1:4,:,:,:,:] .* c.module_list[layer_id].stride
             io[5:end,:,:,:,:] = sigm.(io[5:end,:,:,:,:])
 
