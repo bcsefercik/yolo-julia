@@ -164,15 +164,14 @@ function meshgrid(x, y)
    return X, Y
 end
 
+function nms(prediction; conf_thres=0.05, iou_thres=0.6)
 
-function nms(prediction; conf_thres=0.5, iou_thres=0.6)
-
-    temp = prediction[3,:,:,:,:]
-    prediction[3,:,:,:,:] = prediction[4,:,:,:,:]
-    prediction[4,:,:,:,:] = temp
-    temp = prediction[1,:,:,:,:]
-    prediction[1,:,:,:,:] = prediction[2,:,:,:,:]
-    prediction[2,:,:,:,:] = temp
+#     temp = prediction[3,:,:,:,:]
+#     prediction[3,:,:,:,:] = prediction[4,:,:,:,:]
+#     prediction[4,:,:,:,:] = temp
+#     temp = deepcopy(prediction[1,:,:,:,:])
+#     prediction[1,:,:,:,:] = prediction[2,:,:,:,:]
+#     prediction[2,:,:,:,:] = temp
 
     min_wh, max_wh = 2, 4096
     bs = size(prediction)[3]
@@ -256,6 +255,7 @@ function nms_class(p; iou_thres=0.6)
 
     idxs = sortperm(p[5, :])
     pick = Array{Integer}([])
+    bboxes = nothing
 
     while length(idxs) > 0
         lst = length(idxs)
@@ -264,13 +264,26 @@ function nms_class(p; iou_thres=0.6)
 
         xx1 = max.(x1[i], x1[idxs[1:lst-1]])
         yy1 = max.(y1[i], y1[idxs[1:lst-1]])
-        xx2 = max.(x2[i], x2[idxs[1:lst-1]])
-        yy2 = max.(y2[i], y2[idxs[1:lst-1]])
+        xx2 = min.(x2[i], x2[idxs[1:lst-1]])
+        yy2 = min.(y2[i], y2[idxs[1:lst-1]])
 
         w = max.(0, xx2 - xx1 .+ 1)
         h = max.(0, yy2 - yy1 .+ 1)
 
         overlap = (w .* h) ./ area[idxs[1:lst-1]]
+
+        to_be_merged = cat(
+                            [i for (i, v) in enumerate(overlap) if v > iou_thres],
+                            lst,
+                            dims=1
+                        )
+        merged = merge_bboxes(p[:, to_be_merged])
+        if bboxes == nothing
+            bboxes = merged
+        else
+            bboxes = cat(bboxes, merged, dims=2)
+        end
+
         deleteat!(
             idxs,
             cat(
@@ -283,4 +296,15 @@ function nms_class(p; iou_thres=0.6)
     end
 
     return p[1:end, pick]
+    return bboxes
+end
+
+function merge_bboxes(bboxes)
+    result = convert(Array{Float32}, zeros(size(bboxes)[1], 1))
+    result[1, 1] = minimum(bboxes[1, :])
+    result[2, 1] = minimum(bboxes[2, :])
+    result[3, 1] = maximum(bboxes[3, :])
+    result[4, 1] = maximum(bboxes[4, :])
+    result[5, 1] = sum(bboxes[5, :]) ./ size(bboxes)[2]
+    return result
 end
