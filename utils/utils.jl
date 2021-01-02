@@ -165,14 +165,6 @@ function meshgrid(x, y)
 end
 
 function nms(prediction; conf_thres=0.05, iou_thres=0.6)
-
-#     temp = prediction[3,:,:,:,:]
-#     prediction[3,:,:,:,:] = prediction[4,:,:,:,:]
-#     prediction[4,:,:,:,:] = temp
-#     temp = deepcopy(prediction[1,:,:,:,:])
-#     prediction[1,:,:,:,:] = prediction[2,:,:,:,:]
-#     prediction[2,:,:,:,:] = temp
-
     min_wh, max_wh = 2, 4096
     bs = size(prediction)[3]
     n = size(prediction)[1]
@@ -191,7 +183,12 @@ function nms(prediction; conf_thres=0.05, iou_thres=0.6)
         x = x[:, x[3, :] .< max_wh]
         x = x[:, x[4, :] .< max_wh]
 
-        if length(x) == 0; continue; end
+        result = []
+
+        if length(x) == 0
+            push!(results, result)
+            continue
+        end
 
         x[6:end, :] = x[6:end, :] .* x[5:5, :]  # conf = obj_conf * cls_conf
 
@@ -224,8 +221,6 @@ function nms(prediction; conf_thres=0.05, iou_thres=0.6)
             end
         end
 
-        result = []
-
         for (k, v) in dets
             nmsed = nms_class(v, iou_thres=iou_thres)
 
@@ -237,7 +232,6 @@ function nms(prediction; conf_thres=0.05, iou_thres=0.6)
         end
 
         push!(results, result)
-
     end
 
     return results
