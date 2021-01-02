@@ -11,6 +11,24 @@ include("../coco2014.jl")
 
 MINOVERLAP = 0.5  # default value (defined in the PASCAL VOC2012 challenge)
 
+
+function compute_mAP(model::Darknet, data::COCO2014Data)
+    b = 13
+    bs = 8
+    batch_count = floor(Integer, length(data)/bs)
+
+    sum_mAP = 0.0
+    for b in 1:batch_count-1
+        xx, yy = convert(Knet.atype(), data.x[:, :, :, 1+(b-1)*bs:b*bs]), data.y[1+(b-1)*bs:b*bs]
+        result = model(xx, training=false, conf_thres=0.8);
+        mAP, _ = compute_mAP(result, yy)
+        sum_mAP += mAP
+    end
+
+    return sum_mAP / batch_count
+end
+
+
 function compute_mAP(preds, labels, iou_thres=MINOVERLAP)
     NUM_CLASSES = length(CLASS_MAP)
 
