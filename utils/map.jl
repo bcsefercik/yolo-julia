@@ -1,5 +1,6 @@
 using Knet
 import Knet: Data
+import ProgressMeter
 
 include("utils.jl")
 include("constants.jl")
@@ -18,11 +19,14 @@ function compute_mAP(model::Darknet, data::COCO2014Data)
     batch_count = floor(Integer, length(data)/bs)
 
     sum_mAP = 0.0
+    p = ProgressMeter.Progress(batch_count, 1)
     for b in 1:batch_count-1
         xx, yy = convert(Knet.atype(), data.x[:, :, :, 1+(b-1)*bs:b*bs]), data.y[1+(b-1)*bs:b*bs]
         result = model(xx, training=false, conf_thres=0.8);
         mAP, _ = compute_mAP(result, yy)
         sum_mAP += mAP
+
+        ProgressMeter.update!(p, b)
     end
 
     return sum_mAP / batch_count
