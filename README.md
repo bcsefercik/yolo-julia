@@ -64,8 +64,7 @@ Training tool for YOLOv3. You can see the available training parameter options b
 julia train.jl --help
 
 ###
-Output:
-arguments:
+Arguments:
   --model-out MODEL-OUT
                         Model file path to save the trained model.
   --results RESULTS     Result file. (default: "results.jld2")

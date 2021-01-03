@@ -2,7 +2,7 @@
 *.zip
 *labels.json
 .ipynb_checkpoints/*
-ijulia_notebooks/.ipynb_checkpoints/*
+ijulia_notebooks/*
 examples/.ipynb_checkpoints/*
 *~
 *.jld2
