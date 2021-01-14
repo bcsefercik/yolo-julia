@@ -33,6 +33,16 @@ __Model Creation__
 darknet = Darknet(<model_cfg_file>; img_size=(416, 416))
 ```
 
+__Load Pre-trained Darknet Weights__
+
+Please download original *`yolov3.weights`* from [this link]("https://pjreddie.com/media/files/yolov3.weights").
+
+```
+include("utils/load_darknet_weights.jl")
+
+load_darknet_weights(darknet, "yolov3.weights")
+```
+
 __Save/Load a Model__
 ```
 # To save:
