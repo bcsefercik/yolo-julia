@@ -90,7 +90,7 @@ end
 
 
 # 2D convolution
-struct Conv2d
+mutable struct Conv2d
     w; b; stride; padding;
 
     function Conv2d(
@@ -132,7 +132,7 @@ end
 
 
 # 2D Batch Normalization
-struct BatchNorm2d
+mutable struct BatchNorm2d
     moments; params; eps
 
     function BatchNorm2d(

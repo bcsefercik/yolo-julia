@@ -191,7 +191,7 @@ function (c::Darknet)(x; training=true, iou_thres=0.4, conf_thres=0.99)
                 results = cat(results, r, dims=2)
             end
         end
-        
+
         results = convert(Array{Float32}, results)
         results = nms(results, conf_thres=conf_thres, iou_thres=iou_thres);
 
