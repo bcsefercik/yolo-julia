@@ -1,4 +1,5 @@
 import Images
+import Images: N0f8, RGB, Normed
 import ImageDraw
 import Plots
 
@@ -63,7 +64,7 @@ end
 
 function draw_results(x, y_pred, y_gold=nothing, font_size=10)
     A = permutedims(x, (3,1,2))
-    img = colorview(RGB, A)
+    img = Images.colorview(RGB, A)
 
     img = convert(shown_img_type, img);
 
@@ -87,14 +88,20 @@ function draw_results(x, y_pred, y_gold=nothing, font_size=10)
     for i in 1:length(y_pred)
         r = y_pred_int[i]
         x1, y1 = r[2], r[3]
+        Plots.annotate!(p,
+            x1,
+            y1 - font_size - 2,
+            Plots.text("█████", :white, :left, "verdana", font_size + 2)
+        )
         Plots.annotate!(
             p,
-            x1,
+            x1 + 2,
             y1 - font_size,
-            text(
+            Plots.text(
                 CLASS_NAMES_R[r[1]],
                 COLORS[r[1]],
                 :left,
+                "verdana",
                 font_size
             )
         )

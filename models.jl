@@ -131,7 +131,7 @@ struct Darknet
 end
 
 
-function (c::Darknet)(x; training=true, iou_thres=0.4, conf_thres=0.99)
+function (c::Darknet)(x; training=true, iou_thres=0.4, conf_thres=0.9)
     img_size = size(x)[1:2]
     yolo_out, out = [], []
 

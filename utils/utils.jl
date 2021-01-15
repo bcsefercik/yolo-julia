@@ -266,17 +266,17 @@ function nms_class(p; iou_thres=0.6)
 
         overlap = (w .* h) ./ area[idxs[1:lst-1]]
 
-        to_be_merged = cat(
-                            [i for (i, v) in enumerate(overlap) if v > iou_thres],
-                            lst,
-                            dims=1
-                        )
-        merged = merge_bboxes(p[:, to_be_merged])
-        if bboxes == nothing
-            bboxes = merged
-        else
-            bboxes = cat(bboxes, merged, dims=2)
-        end
+        # to_be_merged = cat(
+        #                     [i for (i, v) in enumerate(overlap) if v > iou_thres],
+        #                     lst,
+        #                     dims=1
+        #                 )
+        # merged = merge_bboxes(p[:, to_be_merged])
+        # if bboxes == nothing
+        #     bboxes = merged
+        # else
+        #     bboxes = cat(bboxes, merged, dims=2)
+        # end
 
         deleteat!(
             idxs,
@@ -290,7 +290,7 @@ function nms_class(p; iou_thres=0.6)
     end
 
     return p[1:end, pick]
-    return bboxes
+    # return bboxes
 end
 
 function merge_bboxes(bboxes)

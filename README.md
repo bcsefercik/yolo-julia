@@ -20,6 +20,13 @@ import Pkg
 Pkg.activate("Project.toml")
 ```
 
+## Prediction
+
+![YOLOv3 Dog Prediction](data/dog_predicted.png "YOLOv3 Dog Prediction")
+
+
+Please see [examples/example_usage.ipynb](examples/example_usage.ipynb).
+
 ## File Descriptions
 ### models.jl
 In this file you will find code for creating/loading/saving Darknet architecture. Also, methods for loss calculation and object detection inference.
