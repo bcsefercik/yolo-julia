@@ -9,10 +9,10 @@ function load_darknet_weights(model, weights, cutoff=-1)
 
     for (i, mdef) in enumerate(model.module_defs[2:end+cutoff])
         if mdef["type"] == "convolutional"
-            conv = darknet.module_list[i].layers[1];
+            conv = model.module_list[i].layers[1];
 
             if mdef["batch_normalize"]
-                bn = darknet.module_list[i].layers[2];
+                bn = model.module_list[i].layers[2];
 
                 nb = length(_bnbias(bn.params));
                 moment_size = _wsize(conv.w);
